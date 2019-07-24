@@ -10,7 +10,10 @@ class DataSyncServiceProvider extends ServiceProvider {
 
     public function boot()
     {
-        // TODO: publish config file
+        $this->publishes([
+            __DIR__.'/config/datasync.php' => config_path('datasync.php'),
+        ]);
+
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
     }
 
