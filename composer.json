@@ -1,0 +1,26 @@
+{
+	"name": "baufragen/laravel-data-sync",
+	"description": "Handles syncing data between multiple projects with API endpoints",
+	"authors": [
+		{
+			"name": "Frank Tiersch",
+			"email": "mail@ftiersch.de"
+		}
+	],
+	"minimum-stability": "dev",
+	"require": {
+		"guzzlehttp/guzzle": "~6.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Baufragen\\DataSync\\": "src/"
+		}
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Baufragen\\DataSync\\DataSyncServiceProvider"
+			]
+		}
+	}
+}
