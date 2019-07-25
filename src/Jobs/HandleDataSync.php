@@ -25,6 +25,7 @@ class HandleDataSync implements ShouldQueue {
         $this->identifier   = $identifier;
         $this->data         = $data;
         $this->action       = $action;
+        $this->encrypted    = !empty(config('datasync.connections.' . $connection . '.encrypted'));
     }
 
     public function handle() {
@@ -32,10 +33,11 @@ class HandleDataSync implements ShouldQueue {
 
         $response = $client->post(route('dataSync.handle', [], false), [
             'form_params' => [
+                'connection'    => config('datasync.own_connection'),
                 'model'         => $this->syncName,
                 'identifier'    => $this->identifier,
                 'action'        => $this->action,
-                'data'          => $this->data,
+                'data'          => $this->encrypted ? encrypt($this->data) : $this->data,
             ],
         ]);
 

@@ -12,7 +12,7 @@ class DataSyncServiceProvider extends ServiceProvider {
     {
         $this->publishes([
             __DIR__.'/config/datasync.php' => config_path('datasync.php'),
-        ]);
+        ], 'datasync');
 
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
     }

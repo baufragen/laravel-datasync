@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Controllers;
 
+use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -13,13 +14,20 @@ class DataSyncController extends BaseController {
 
     public function handleIncomingSync(Request $request) {
         $this->validate($request, [
+            'connection'    => 'required',
             'model'         => 'required',
             'identifier'    => 'nullable|integer',
             'data'          => 'nullable',
             'action'        => 'required'
         ]);
 
-        $modelClass = app('dataSync.container')->getClassBySyncName($request);
+        $connectionConfig = config('datasync.connections.' . $request->get('connection'));
+
+        if (empty($connectionConfig)) {
+            throw new ConfigNotFoundException('No config for incoming connection ' . $request->get('connection'));
+        }
+
+        $modelClass = app('dataSync.container')->getClassBySyncName($request->get('model'));
 
         $action = new DataSyncAction($request->get('action'));
 
@@ -29,10 +37,12 @@ class DataSyncController extends BaseController {
             $model = new $modelClass();
         }
 
-        $validator = Validator::make($request->get('data'), $model->dataSyncValidationRules())
+        $data = $connectionConfig['encrypted'] ? decrypt($request->get('data')) : $request->get('data');
+
+        $validator = Validator::make($data, $model->dataSyncValidationRules())
                                 ->validate();
 
-        if (!$model->handleDataSync($action, $request->get('data'))) {
+        if (!$model->handleDataSync($action, $data)) {
             abort(500);
         }
 

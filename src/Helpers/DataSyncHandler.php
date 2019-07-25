@@ -6,6 +6,10 @@ use Baufragen\DataSync\Jobs\HandleDataSync;
 
 class DataSyncHandler {
     public function executeSync($action, $model) {
+        if (app()->environment('testing')) {
+            return;
+        }
+
         $syncName   = $model->getSyncName();
         $data       = $model->customizeSyncableData();
         $identifier = $model->id;
