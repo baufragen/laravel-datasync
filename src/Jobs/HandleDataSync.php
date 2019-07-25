@@ -13,23 +13,23 @@ use Illuminate\Queue\SerializesModels;
 class HandleDataSync implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $connection;
+    protected $dataSyncConnection;
     protected $data;
     protected $syncName;
     protected $identifier;
     protected $action;
 
-    public function __construct($connection, $syncName, $data, $action, $identifier = null) {
-        $this->connection   = $connection;
+    public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null) {
+        $this->dataSyncConnection   = $dataSyncConnection;
         $this->syncName     = $syncName;
         $this->identifier   = $identifier;
         $this->data         = $data;
         $this->action       = $action;
-        $this->encrypted    = !empty(config('datasync.connections.' . $connection . '.encrypted'));
+        $this->encrypted    = !empty(config('datasync.connections.' . $dataSyncConnection . '.encrypted'));
     }
 
     public function handle() {
-        $client = new DataSyncClient($this->connection);
+        $client = new DataSyncClient($this->dataSyncConnection);
 
         $response = $client->post(route('dataSync.handle', [], false), [
             'form_params' => [

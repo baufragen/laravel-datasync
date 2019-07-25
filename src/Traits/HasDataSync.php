@@ -8,25 +8,33 @@ use Baufragen\DataSync\Jobs\HandleDataSync;
 
 trait HasDataSync {
 
+    protected static $dataSyncTemporarilyDisabled = false;
+
     public static function bootHasDataSync() {
 
         app('dataSync.container')->registerModel((new static())->getSyncName(), static::class);
 
         static::created(function ($model) {
 
-            app('dataSync.handler')->executeSync(DataSyncAction::CREATE, $model);
+            if (!static::$dataSyncTemporarilyDisabled) {
+                app('dataSync.handler')->executeSync(DataSyncAction::CREATE, $model);
+            }
 
         });
 
         static::updated(function ($model) {
 
-            app('dataSync.handler')->executeSync(DataSyncAction::UPDATE, $model);
+            if (!static::$dataSyncTemporarilyDisabled) {
+                app('dataSync.handler')->executeSync(DataSyncAction::UPDATE, $model);
+            }
 
         });
 
         static::deleted(function ($model) {
 
-            app('dataSync.handler')->executeSync(DataSyncAction::DELETE, $model);
+            if (!static::$dataSyncTemporarilyDisabled) {
+                app('dataSync.handler')->executeSync(DataSyncAction::DELETE, $model);
+            }
 
         });
 
@@ -161,6 +169,14 @@ trait HasDataSync {
         }
 
         return array_keys($connections);
+    }
+
+    public static function disableDataSync() {
+        static::$dataSyncTemporarilyDisabled = true;
+    }
+
+    public static function enableDataSync() {
+        static::$dataSyncTemporarilyDisabled = false;
     }
 
 }
