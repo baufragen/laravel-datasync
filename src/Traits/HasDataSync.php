@@ -9,7 +9,7 @@ trait HasDataSync {
 
     public static function bootHasDataSync() {
 
-        app('dataSync.container')->registerModel(static::getSyncName(), static::class);
+        app('dataSync.container')->registerModel((new static())->getSyncName(), static::class);
 
         static::created(function ($model) {
 
