@@ -18,6 +18,7 @@ class HandleDataSync implements ShouldQueue {
     protected $syncName;
     protected $identifier;
     protected $action;
+    protected $encrypted;
 
     public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null) {
         $this->dataSyncConnection   = $dataSyncConnection;
