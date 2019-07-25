@@ -15,7 +15,8 @@ class DataSyncClient extends Client {
         }
 
         $config = [
-            'base_uri' => $connectionDetails['baseurl'],
+            'base_uri'  => $connectionDetails['baseurl'],
+            'verify'    => false, // TODO: make this configurable
         ];
 
         parent::__construct($config);
