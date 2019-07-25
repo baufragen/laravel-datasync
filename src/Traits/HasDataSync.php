@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Traits;
 
+use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Jobs\HandleDataSync;
 
@@ -153,7 +154,13 @@ trait HasDataSync {
      * @return array
      */
     public function dataSyncConnections() {
-        return array_keys(config('datasync.endpoints'));
+        $connections = config('datasync.connections');
+
+        if (!$connections) {
+            throw new ConfigNotFoundException("No config found for Model " . $this->getSyncName());
+        }
+
+        return array_keys($connections);
     }
 
 }
