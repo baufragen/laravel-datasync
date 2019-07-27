@@ -42,7 +42,7 @@ class HandleDataSync implements ShouldQueue {
             ],
         ]);
 
-        if ($response->getStatusCode() !== 200 || $response->getStatusCode() !== 201) {
+        if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
         }
     }
