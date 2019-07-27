@@ -39,8 +39,10 @@ class DataSyncController extends BaseController {
 
         $data = !empty($connectionConfig['encrypted']) ? decrypt($request->get('data')) : $request->get('data');
 
-        $validator = Validator::make($data, $model->dataSyncValidationRules())
-                                ->validate();
+        if (!empty($data)) {
+            Validator::make($data, $model->dataSyncValidationRules())
+                ->validate();
+        }
 
         if (!$model->handleDataSync($action, $data)) {
             abort(500);
