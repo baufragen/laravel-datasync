@@ -91,10 +91,10 @@ trait HasDataSync {
      * @param array|null $data
      * @return mixed
      */
-    public function handleDataSync(DataSyncAction $action, $data) {
+    public function handleDataSync(DataSyncAction $action, $data, $identifier = null) {
         switch ($action->action) {
             case DataSyncAction::CREATE:
-                return $this->handleDataSyncCreate($data);
+                return $this->handleDataSyncCreate($data, $identifier);
                 break;
 
             case DataSyncAction::UPDATE:
@@ -115,8 +115,11 @@ trait HasDataSync {
      * @param array $data
      * @return mixed
      */
-    public function handleDataSyncCreate($data) {
+    public function handleDataSyncCreate($data, $identifier = null) {
         $model = new static($data);
+        if ($identifier) {
+            $model->id = $identifier;
+        }
         $model->saveWithoutDataSync();
 
         return $model;
