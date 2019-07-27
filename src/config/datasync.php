@@ -2,6 +2,10 @@
 
 return [
 
+    'models'    => [
+        App\User::class => 'user',
+    ],
+
     'own_connection'    => env('DATASYNC_OWN_CONNECTION'),
 
     /**

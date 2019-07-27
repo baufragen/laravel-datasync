@@ -12,8 +12,6 @@ trait HasDataSync {
 
     public static function bootHasDataSync() {
 
-        app('dataSync.container')->registerModel((new static())->getSyncName(), static::class);
-
         static::created(function ($model) {
 
             if (!static::$dataSyncTemporarilyDisabled) {
