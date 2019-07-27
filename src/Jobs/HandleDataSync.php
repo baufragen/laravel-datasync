@@ -14,6 +14,7 @@ class HandleDataSync implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $dataSyncConnection;
+    protected $apiKey;
     protected $data;
     protected $syncName;
     protected $identifier;
@@ -22,6 +23,7 @@ class HandleDataSync implements ShouldQueue {
 
     public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null) {
         $this->dataSyncConnection   = $dataSyncConnection;
+        $this->apiKey       = config('datasync.connections.' . $dataSyncConnection . ".apikey");
         $this->syncName     = $syncName;
         $this->identifier   = $identifier;
         $this->data         = $data;
@@ -35,6 +37,7 @@ class HandleDataSync implements ShouldQueue {
         $response = $client->post(route('dataSync.handle', [], false), [
             'form_params' => [
                 'connection'    => config('datasync.own_connection'),
+                'apikey'        => $this->apiKey,
                 'model'         => $this->syncName,
                 'identifier'    => $this->identifier,
                 'action'        => $this->action,

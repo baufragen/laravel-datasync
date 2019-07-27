@@ -17,7 +17,6 @@ return [
         'example' => [
             'baseurl'   => 'https://api.example.com/',
             'apikey'    => '123456789',
-            'secret'    => '123456789',
             'enabled'   => true,
             'encrypted' => true,
         ],
