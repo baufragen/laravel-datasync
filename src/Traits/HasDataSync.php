@@ -145,7 +145,6 @@ trait HasDataSync {
      * @return bool
      */
     public function handleDataSyncDelete($data) {
-        $this->delete();
         $this->deleteWithoutDataSync();
 
         return true;
