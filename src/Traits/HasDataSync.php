@@ -116,7 +116,10 @@ trait HasDataSync {
      * @return mixed
      */
     public function handleDataSyncCreate($data) {
-        return static::create($data);
+        $model = new static($data);
+        $model->saveWithoutDataSync();
+
+        return $model;
     }
 
     /**
@@ -127,7 +130,7 @@ trait HasDataSync {
      */
     public function handleDataSyncUpdate($data) {
         $this->fill($data);
-        $this->save();
+        $this->saveWithoutDataSync();
 
         return $this;
     }
@@ -140,6 +143,7 @@ trait HasDataSync {
      */
     public function handleDataSyncDelete($data) {
         $this->delete();
+        $this->deleteWithoutDataSync();
 
         return true;
     }
@@ -175,6 +179,20 @@ trait HasDataSync {
 
     public static function enableDataSync() {
         static::$dataSyncTemporarilyDisabled = false;
+    }
+
+    public function saveWithoutDataSync() {
+        static::disableDataSync();
+        $this->save();
+        static::enableDataSync();
+
+        return $this;
+    }
+
+    public function deleteWithoutDataSync() {
+        static::disableDataSync();
+        $this->delete();
+        static::enableDataSync();
     }
 
 }
