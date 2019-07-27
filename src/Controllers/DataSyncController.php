@@ -16,7 +16,7 @@ class DataSyncController extends BaseController {
     public function handleIncomingSync(Request $request) {
         $this->validate($request, [
             'connection'    => 'required',
-            'apikey'        => new CorrectDataSyncApiKey($request->get('connection')),
+            'apikey'        =>  ['required', new CorrectDataSyncApiKey($request->get('connection'))],
             'model'         => 'required',
             'identifier'    => 'nullable|integer',
             'data'          => 'nullable',
