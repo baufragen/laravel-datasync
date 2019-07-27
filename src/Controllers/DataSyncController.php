@@ -44,8 +44,10 @@ class DataSyncController extends BaseController {
                 ->validate();
         }
 
-        if (!$model->handleDataSync($action, $data)) {
-            abort(500);
+        try {
+            $model->handleDataSync($action, $data);
+        } catch (\Exception $e) {
+            abort(500, $e->getMessage());
         }
 
         return response(null, 200);
