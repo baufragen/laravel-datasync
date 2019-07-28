@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use GuzzleHttp\Exception\RequestException;
 
 class HandleDataSync implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -37,25 +38,29 @@ class HandleDataSync implements ShouldQueue {
     public function handle() {
         $client = new DataSyncClient($this->dataSyncConnection);
 
-        $response = $client->post(route('dataSync.handle', [], false), [
-            'form_params' => [
-                'connection'    => config('datasync.own_connection'),
-                'apikey'        => $this->apiKey,
-                'model'         => $this->syncName,
-                'identifier'    => $this->identifier,
-                'action'        => $this->action,
-                'data'          => $this->encrypted ? encrypt($this->data) : $this->data,
-            ],
-        ]);
+        try {
+            $response = $client->post(route('dataSync.handle', [], false), [
+                'form_params' => [
+                    'connection'    => config('datasync.own_connection'),
+                    'apikey'        => $this->apiKey,
+                    'model'         => $this->syncName,
+                    'identifier'    => $this->identifier,
+                    'action'        => $this->action,
+                    'data'          => $this->encrypted ? encrypt($this->data) : $this->data,
+                ],
+            ]);
 
-        if ($response->getStatusCode() === 200 || $response->getStatusCode === 201) {
-            if ($this->shouldLog) {
-                DataSyncLog::succeeded($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection);
+            if ($response->getStatusCode() === 200 || $response->getStatusCode === 201) {
+                if ($this->shouldLog) {
+                    DataSyncLog::succeeded($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection);
+                }
             }
-        } else {
+        } catch (RequestException $e) {
             // errors always get logged
-            DataSyncLog::failed($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection, $this->data, $response);
+            DataSyncLog::failed($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection, $this->data, $e->getResponse());
 
+            throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
+        } catch (\Exception $e) {
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
         }
     }
