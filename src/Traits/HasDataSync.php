@@ -76,7 +76,13 @@ trait HasDataSync {
      * @return array
      */
     public function getSyncableData() {
-        $changedFields = array_intersect_key($this->getDirty(), array_flip($this->getSyncedFields()));
+        $allFields = $this->getDirty();
+
+        if (empty($allFields)) {
+            $allFields = $this->getAttributes();
+        }
+
+        $changedFields = array_intersect_key($allFields, array_flip($this->getSyncedFields()));
 
         return $changedFields;
     }
