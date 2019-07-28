@@ -16,7 +16,7 @@ class CreateDataSyncLogsTable extends Migration
         Schema::create('data_sync_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->bool('successful')
+            $table->boolean('successful')
                 ->comment('Was the syncing successful?');
 
             $table->string('model')
