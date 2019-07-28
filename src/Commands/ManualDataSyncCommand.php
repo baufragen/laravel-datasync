@@ -87,7 +87,7 @@ class ManualDataSyncCommand extends Command {
 	}
 
 	protected function verboseInfo($info) {
-        if ($this->verbosity === OutputInterface::VERBOSITY_VERBOSE) {
+        if ($this->getOutput()->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
             $this->info($info);
         }
     }
