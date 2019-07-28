@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DataSyncLog extends Model
 {
+    protected $guarded = [];
+
     public static function succeeded($action, $model, $identifier, $connection) {
         return self::create([
             'successful'    => true,
