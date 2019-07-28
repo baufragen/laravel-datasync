@@ -15,6 +15,7 @@ class DataSyncServiceProvider extends ServiceProvider {
         ], 'datasync');
 
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
+        $this->loadMigrationsFrom(__DIR__ . '/migrations');
     }
 
     public function register()

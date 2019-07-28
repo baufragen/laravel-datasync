@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Jobs;
 
+use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Exceptions\DataSyncRequestFailedException;
 use Baufragen\DataSync\Helpers\DataSyncClient;
 use Illuminate\Bus\Queueable;
@@ -20,14 +21,16 @@ class HandleDataSync implements ShouldQueue {
     protected $identifier;
     protected $action;
     protected $encrypted;
+    protected $shouldLog;
 
-    public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null) {
+    public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null, $shouldLog = true) {
         $this->dataSyncConnection   = $dataSyncConnection;
         $this->apiKey       = config('datasync.connections.' . $dataSyncConnection . ".apikey");
         $this->syncName     = $syncName;
         $this->identifier   = $identifier;
         $this->data         = $data;
         $this->action       = $action;
+        $this->shouldLog    = $shouldLog;
         $this->encrypted    = !empty(config('datasync.connections.' . $dataSyncConnection . '.encrypted'));
     }
 
@@ -45,7 +48,14 @@ class HandleDataSync implements ShouldQueue {
             ],
         ]);
 
-        if ($response->getStatusCode() !== 200 && $response->getStatusCode() !== 201) {
+        if ($response->getStatusCode() === 200 || $response->getStatusCode === 201) {
+            if ($this->shouldLog) {
+                DataSyncLog::succeeded($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection);
+            }
+        } else {
+            // errors always get logged
+            DataSyncLog::failed($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection, $this->data, $response);
+
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
         }
     }

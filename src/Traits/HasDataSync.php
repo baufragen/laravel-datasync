@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Traits;
 
+use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Jobs\HandleDataSync;
@@ -36,6 +37,11 @@ trait HasDataSync {
 
         });
 
+    }
+
+    public function dataSyncLogs() {
+        return $this->hasMany(DataSyncLog::class, 'identifier')->where('model', $this->getSyncName())
+                ->orderBy('created_at', 'DESC');
     }
 
     /**
@@ -195,6 +201,10 @@ trait HasDataSync {
         static::disableDataSync();
         $this->delete();
         static::enableDataSync();
+    }
+
+    public function dataSyncShouldBeLogged() {
+        return !property_exists($this, 'dataSyncLoggingDisabled') || $this->dataSyncLoggingDisabled === false;
     }
 
 }
