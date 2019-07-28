@@ -59,9 +59,9 @@ class HandleDataSync implements ShouldQueue {
             // errors always get logged
             DataSyncLog::failed($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection, $this->data, $e->getResponse());
 
-            throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
+            throw new DataSyncRequestFailedException("DataSync Request failed (" . $e->getResponse()->getStatusCode() . "): " . $e->getResponse()->getReasonPhrase());
         } catch (\Exception $e) {
-            throw new DataSyncRequestFailedException("DataSync Request failed (" . $response->getStatusCode() . "): " . $response->getReasonPhrase());
+            throw new DataSyncRequestFailedException("DataSync Request failed with Exception: " . $e->getMessage());
         }
     }
 }
