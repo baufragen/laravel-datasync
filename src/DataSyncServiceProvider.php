@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync;
 
+use Baufragen\DataSync\Commands\ManualDataSyncCommand;
 use Baufragen\DataSync\Helpers\DataSyncContainer;
 use Baufragen\DataSync\Helpers\DataSyncHandler;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +17,12 @@ class DataSyncServiceProvider extends ServiceProvider {
 
         $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
         $this->loadMigrationsFrom(__DIR__ . '/migrations');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                ManualDataSyncCommand::class,
+            ]);
+        }
     }
 
     public function register()

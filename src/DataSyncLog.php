@@ -8,6 +8,14 @@ class DataSyncLog extends Model
 {
     protected $guarded = [];
 
+    public function scopeSuccessful($query) {
+        $query->where('successful', true);
+    }
+
+    public function scopeFailed($query) {
+        $query->where('successful', false);
+    }
+
     public static function succeeded($action, $model, $identifier, $connection) {
         return self::create([
             'successful'    => true,

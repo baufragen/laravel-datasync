@@ -207,4 +207,22 @@ trait HasDataSync {
         return !property_exists($this, 'dataSyncLoggingDisabled') || $this->dataSyncLoggingDisabled === false;
     }
 
+    public function needsInitialDataSync() {
+        return !$this->dataSyncLogs()->successful()->exists();
+    }
+
+    public function needsManualDataSync() {
+        $latestSync = $this->dataSyncLogs()->successful()->first();
+
+        return $latestSync->created_at->diffInSeconds($this->updated_at) > 5;
+    }
+
+    public function triggerInitialDataSync() {
+        app('dataSync.handler')->executeSync(DataSyncAction::CREATE, $this);
+    }
+
+    public function triggerManualDataSync() {
+        app('dataSync.handler')->executeSync(DataSyncAction::UPDATE, $this);
+    }
+
 }
