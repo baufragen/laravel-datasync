@@ -60,24 +60,28 @@ class ManualDataSyncCommand extends Command {
             $modelClass::chunk(100, function ($entities) use ($modelClass) {
 
                 $entities->each(function ($entity) use ($modelClass) {
-                    // for every instance check if the last successful sync log is more than ~5 seconds before the updated_at
 
-                    if ($entity->needsInitialDataSync()) {
+                    try {
+                        // for every instance check if the last successful sync log is more than ~5 seconds before the updated_at
+                        if ($entity->needsInitialDataSync()) {
 
-                        if (!$this->debug) {
-                            $entity->triggerInitialDataSync();
+                            if (!$this->debug) {
+                                $entity->triggerInitialDataSync();
+                            }
+                            $this->verboseInfo('Triggered initial data sync for ' . $modelClass . ' [' . $entity->id . ']');
+                            return;
+
+                        } else if ($entity->needsManualDataSync()) {
+
+                            if (!$this->debug) {
+                                $entity->triggerManualDataSync();
+                            }
+                            $this->verboseInfo('Triggered manual data sync for ' . $modelClass . '[' . $entity->id . ']');
+                            return;
+
                         }
-                        $this->verboseInfo('Triggered initial data sync for ' . $modelClass . ' [' . $entity->id . ']');
-                        return;
-
-                    } else if ($entity->needsManualDataSync()) {
-
-                        if (!$this->debug) {
-                            $entity->triggerManualDataSync();
-                        }
-                        $this->verboseInfo('Triggered manual data sync for ' . $modelClass . '[' . $entity->id . ']');
-                        return;
-
+                    } catch (\Exception $e) {
+                        $this->error('Error during sync for ' . $modelClass . ' [' . $entity->id . ']: ' . $e->getMessage());
                     }
 
                 });
