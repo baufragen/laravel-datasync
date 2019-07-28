@@ -34,7 +34,7 @@ class DataSyncLog extends Model
             'identifier'    => $identifier,
             'connection'    => $connection,
             'payload'       => encrypt(json_encode($payload)),
-            'response'      => $response->getReasonPhrase(),
+            'response'      => $response->getBody(),
         ]);
     }
 }
