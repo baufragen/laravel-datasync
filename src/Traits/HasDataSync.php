@@ -231,21 +231,21 @@ trait HasDataSync {
 
         $relation = $this->$relationship();
 
-        if ($relation instanceof Illuminate\Database\Eloquent\Relations\HasMany) {
+        if ($relation instanceof \Illuminate\Database\Eloquent\Relations\HasMany || $relation instanceof \Staudenmeir\EloquentEagerLimit\Relations\HasMany) {
             return [
                 'name' => $relationship,
                 'type' => 'hasMany',
                 'data' => $relation->select('id')->pluck('id')->toArray(),
             ];
         }
-        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsTo) {
-            [
+        else if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo || $relation instanceof \Staudenmeir\EloquentEagerLimit\Relations\BelongsTo) {
+            return [
                 'name' => $relationship,
                 'type' => 'belongsTo',
                 'data' => $relation->first()->id,
             ];
         }
-        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsToMany || $relation instanceof Staudenmeir\EloquentEagerLimit\Relations\BelongsToMany) {
+        else if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany || $relation instanceof \Staudenmeir\EloquentEagerLimit\Relations\BelongsToMany) {
             return [
                 'name' => $relationship,
                 'type' => 'belongsToMany',
