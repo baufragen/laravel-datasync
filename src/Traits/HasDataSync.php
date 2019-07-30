@@ -245,14 +245,16 @@ trait HasDataSync {
                 'data' => $relation->first()->id,
             ];
         }
-        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsToMany || $relation instanceof Staudenmeir\EloquentEagerLimit\Relations\BelongsToMany) {
             return [
                 'name' => $relationship,
                 'type' => 'belongsToMany',
                 'data' => DB::table($relation->getTable())->where($relation->getForeignPivotKeyName(), $this->id)->get()->map(function ($row) use ($relation) {
+                    $row = (array)$row;
+
                     return [
                         'id'    => $row[$relation->getRelatedPivotKeyName()],
-                        'data'  => array_intersect_key($row, array_flip(array_diff_key($row, [$relation->getRelatedPivotKeyName(), $relation->getForeignPivotKeyName()]))),
+                        'data'  => array_intersect_key($row, array_flip(array_diff(array_keys($row), [$relation->getRelatedPivotKeyName(), $relation->getForeignPivotKeyName()]))),
                     ];
                 })->toArray(),
             ];
