@@ -39,6 +39,10 @@ class DataSyncController extends BaseController {
             $model = new $modelClass();
         }
 
+        if (!method_exists($model, "dataSyncValidationRules")) {
+            abort(500, "Class " . $modelClass . " does not implement HasDataSync trait");
+        }
+
         $data = !empty($connectionConfig['encrypted']) ? decrypt($request->get('data')) : $request->get('data');
 
         if (!empty($data)) {

@@ -19,15 +19,17 @@ class HandleDataSync implements ShouldQueue {
     protected $apiKey;
     protected $data;
     protected $syncName;
+    protected $relationdata;
     protected $identifier;
     protected $action;
     protected $encrypted;
     protected $shouldLog;
 
-    public function __construct($dataSyncConnection, $syncName, $data, $action, $identifier = null, $shouldLog = true) {
+    public function __construct($dataSyncConnection, $syncName, $data, $action, $relationdata, $identifier = null, $shouldLog = true) {
         $this->dataSyncConnection   = $dataSyncConnection;
         $this->apiKey       = config('datasync.connections.' . $dataSyncConnection . ".apikey");
         $this->syncName     = $syncName;
+        $this->relationdata    = $relationdata;
         $this->identifier   = $identifier;
         $this->data         = $data;
         $this->action       = $action;
@@ -47,6 +49,7 @@ class HandleDataSync implements ShouldQueue {
                     'identifier'    => $this->identifier,
                     'action'        => $this->action,
                     'data'          => $this->encrypted ? encrypt($this->data) : $this->data,
+                    'relationdata'  => $this->relationdata,
                 ],
             ]);
 

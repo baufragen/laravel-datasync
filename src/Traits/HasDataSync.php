@@ -4,8 +4,9 @@ namespace Baufragen\DataSync\Traits;
 
 use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
+use Baufragen\DataSync\Exceptions\RelationNotFoundException;
 use Baufragen\DataSync\Helpers\DataSyncAction;
-use Baufragen\DataSync\Jobs\HandleDataSync;
+use Illuminate\Support\Facades\DB;
 
 trait HasDataSync {
 
@@ -40,7 +41,8 @@ trait HasDataSync {
     }
 
     public function dataSyncLogs() {
-        return $this->hasMany(DataSyncLog::class, 'identifier')->where('model', $this->getSyncName())
+        return $this->hasMany(DataSyncLog::class, 'identifier')
+                ->where('model', $this->getSyncName())
                 ->orderBy('created_at', 'DESC');
     }
 
@@ -185,6 +187,78 @@ trait HasDataSync {
         }
 
         return array_keys($connections);
+    }
+
+    /**
+     * Can be overwritten to configure which relationships (including pivot data) should
+     * be synced automatically.
+     *
+     * @return array
+     */
+    public function dataSyncRelationships() {
+        return [];
+    }
+
+    /**
+     * Gathers all related data (depending on dataSyncRelationships method).
+     *
+     * @return null|array
+     */
+    public function getSyncedRelationData() {
+        $syncedRelationships = $this->dataSyncRelationships();
+
+        if (empty($syncedRelationships)) {
+            return null;
+        }
+
+        return collect($syncedRelationships)->map(function ($relationship) {
+            return $this->getSyncedRelationDataForRelationship($relationship);
+        })->filter(function ($data) {
+            return !empty($data);
+        })->toArray();
+    }
+
+    /**
+     *
+     * @param string $relationship
+     *
+     * @return null|array
+     */
+    public function getSyncedRelationDataForRelationship($relationship) {
+        if (!method_exists($this, $relationship)) {
+            throw new RelationNotFoundException("Relation " . $relationship . " not found on Model " . static::class);
+        }
+
+        $relation = $this->$relationship();
+
+        if ($relation instanceof Illuminate\Database\Eloquent\Relations\HasMany) {
+            return [
+                'name' => $relationship,
+                'type' => 'hasMany',
+                'data' => $relation->select('id')->pluck('id')->toArray(),
+            ];
+        }
+        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsTo) {
+            [
+                'name' => $relationship,
+                'type' => 'belongsTo',
+                'data' => $relation->first()->id,
+            ];
+        }
+        else if ($relation instanceof Illuminate\Database\Eloquent\Relations\BelongsToMany) {
+            return [
+                'name' => $relationship,
+                'type' => 'belongsToMany',
+                'data' => DB::table($relation->getTable())->where($relation->getForeignPivotKeyName(), $this->id)->get()->map(function ($row) use ($relation) {
+                    return [
+                        'id'    => $row[$relation->getRelatedPivotKeyName()],
+                        'data'  => array_intersect_key($row, array_flip(array_diff_key($row, [$relation->getRelatedPivotKeyName(), $relation->getForeignPivotKeyName()]))),
+                    ];
+                })->toArray(),
+            ];
+        }
+
+        return null;
     }
 
     public static function disableDataSync() {

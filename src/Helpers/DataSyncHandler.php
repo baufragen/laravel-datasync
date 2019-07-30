@@ -10,16 +10,17 @@ class DataSyncHandler {
             return;
         }
 
-        $syncName   = $model->getSyncName();
-        $data       = $model->customizeSyncableData();
-        $identifier = $model->id;
-        $shouldLog  = $model->dataSyncShouldBeLogged();
+        $syncName       = $model->getSyncName();
+        $data           = $model->customizeSyncableData();
+        $identifier     = $model->id;
+        $shouldLog      = $model->dataSyncShouldBeLogged();
+        $relationdata   = $model->getSyncedRelationData();
 
         $connections = collect($model->dataSyncConnections());
 
-        $connections->each(function($connection) use ($syncName, $data, $identifier, $action, $shouldLog) {
+        $connections->each(function($connection) use ($syncName, $data, $identifier, $action, $relationdata, $shouldLog) {
             if (config('datasync.connections.' . $connection . '.enabled')) {
-                HandleDataSync::dispatch($connection, $syncName, $data, $action, $identifier, $shouldLog);
+                HandleDataSync::dispatch($connection, $syncName, $data, $action, $relationdata, $identifier, $shouldLog);
             }
         });
     }
