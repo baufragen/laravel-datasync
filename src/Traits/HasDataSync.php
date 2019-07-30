@@ -239,14 +239,12 @@ trait HasDataSync {
             ];
         }
         else if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsTo || $relation instanceof \Staudenmeir\EloquentEagerLimit\Relations\BelongsTo) {
-            if (is_null($relationObject = $relation->first())) {
-                return null;
-            }
+            $relationObject = $relation->first();
 
             return [
                 'name' => $relationship,
                 'type' => 'belongsTo',
-                'data' => $relationObject->id,
+                'data' => $relationObject ? $relationObject->id : null,
             ];
         }
         else if ($relation instanceof \Illuminate\Database\Eloquent\Relations\BelongsToMany || $relation instanceof \Staudenmeir\EloquentEagerLimit\Relations\BelongsToMany) {
