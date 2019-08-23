@@ -108,8 +108,7 @@ class HandleDataSync implements ShouldQueue {
     }
 
     protected function getAttributesFromCollector(DataSyncCollector $collector, $encrypted) {
-        return $collector
-            ->getAttributes()
+        return collect($collector->getAttributes())
             ->when($encrypted, function ($attributes) {
                 return $attributes->mapWithKeys(function ($attribute, $key) {
                     return [$key => encrypt($attribute)];
@@ -119,8 +118,7 @@ class HandleDataSync implements ShouldQueue {
     }
 
     protected function getFilesFromCollector(DataSyncCollector $collector) {
-        return $collector
-            ->getFiles()
+        return collect($collector->getFiles())
             ->map(function ($file, $name) {
                 if (!file_exists($file['path'])) {
                     return null;
@@ -142,8 +140,7 @@ class HandleDataSync implements ShouldQueue {
     }
 
     protected function getRelatedDataFromCollector(DataSyncCollector $collector, $encrypted) {
-        return $collector
-            ->getRelatedData()
+        return collect($collector->getRelatedData())
             ->when($encrypted, function ($relations) {
                 // TODO: implement encryption
                 return $relations;
