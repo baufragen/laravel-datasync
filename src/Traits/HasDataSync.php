@@ -20,7 +20,7 @@ trait HasDataSync {
                 $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
                 $collector
                     ->initForModel($model);
-                $this->beforeDataSync($collector);
+                $model->beforeDataSync($collector);
 
                 HandleDataSync::dispatch($collector);
             }
@@ -33,7 +33,7 @@ trait HasDataSync {
                 $collector
                     ->initForModel($model)
                     ->identifier($model->id);
-                $this->beforeDataSync($collector);
+                $model->beforeDataSync($collector);
 
                 HandleDataSync::dispatch($collector);
             }
@@ -46,7 +46,7 @@ trait HasDataSync {
                 $collector
                     ->initForModel($model)
                     ->identifier($model->id);
-                $this->beforeDataSync($collector);
+                $model->beforeDataSync($collector);
 
                 HandleDataSync::dispatch($collector);
             }
