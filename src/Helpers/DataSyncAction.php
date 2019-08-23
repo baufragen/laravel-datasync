@@ -24,4 +24,8 @@ class DataSyncAction {
     public function isDelete() {
         return $this->action == self::DELETE;
     }
+
+    public function __toString() {
+        return $this->action;
+    }
 }

@@ -12,7 +12,7 @@ class ManualDataSyncCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $signature = 'datasync:manual-sync {--debug}';
+	protected $signature = 'datasync:manual-sync {--debug} {-model=}';
 
 	/**
 	 * The console command description.
@@ -23,6 +23,8 @@ class ManualDataSyncCommand extends Command {
 
     protected $debug = false;
 
+    protected $models = null;
+
     /**
 	 * Execute the console command.
 	 *
@@ -31,6 +33,12 @@ class ManualDataSyncCommand extends Command {
 	public function handle()
 	{
         $this->debug = $this->option('debug');
+
+        $model = $this->argument('model', null);
+        if ($model) {
+            $this->info('Limiting synced models to ' . $model);
+            $this->models = explode(",", $model);
+        }
 
         if ($this->debug) {
             $this->info('=============');
@@ -50,7 +58,17 @@ class ManualDataSyncCommand extends Command {
         }
 
         // cycle through models
-        $models->each(function ($modelClass) {
+        $models
+            // filter models by argument first
+            // if no argument is set -> allow all models
+            ->filter(function ($model) {
+                if (!$this->models) {
+                    return true;
+                }
+
+                return in_array($model, $this->models);
+            })
+            ->each(function ($modelClass) {
 
             $this->verboseInfo('====================');
             $this->verboseInfo('Syncing ' . $modelClass);

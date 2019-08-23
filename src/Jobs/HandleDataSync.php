@@ -3,8 +3,10 @@
 namespace Baufragen\DataSync\Jobs;
 
 use Baufragen\DataSync\DataSyncLog;
+use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use Baufragen\DataSync\Exceptions\DataSyncRequestFailedException;
 use Baufragen\DataSync\Helpers\DataSyncClient;
+use Baufragen\DataSync\Helpers\DataSyncCollector;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,56 +17,137 @@ use GuzzleHttp\Exception\RequestException;
 class HandleDataSync implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $dataSyncConnection;
-    protected $apiKey;
-    protected $data;
-    protected $syncName;
-    protected $relationdata;
-    protected $identifier;
-    protected $action;
-    protected $encrypted;
-    protected $shouldLog;
+    /** @var DataSyncCollector */
+    protected $dataCollector;
 
-    public function __construct($dataSyncConnection, $syncName, $data, $action, $relationdata, $identifier = null, $shouldLog = true) {
-        $this->dataSyncConnection   = $dataSyncConnection;
-        $this->apiKey       = config('datasync.connections.' . $dataSyncConnection . ".apikey");
-        $this->syncName     = $syncName;
-        $this->relationdata    = $relationdata;
-        $this->identifier   = $identifier;
-        $this->data         = $data;
-        $this->action       = $action;
-        $this->shouldLog    = $shouldLog;
-        $this->encrypted    = !empty(config('datasync.connections.' . $dataSyncConnection . '.encrypted'));
+    public function __construct(DataSyncCollector $collector) {
+        $this->dataCollector = $collector;
     }
 
     public function handle() {
-        $client = new DataSyncClient($this->dataSyncConnection);
+        $this->dataCollector
+            ->getConnections()
+            ->each(function($connection) {
+                $this->syncToConnection($connection);
+            });
+    }
+
+    protected function syncToConnection($connection) {
+        $client = new DataSyncClient($connection);
+
+        $config = config('connections.' . $connection);
+
+        if (empty($config)) {
+            throw new ConfigNotFoundException("Config not found for connection " . $connection);
+        }
+
+        $encrypted  = $config['encrypted'];
+        $apiKey     = $config['apikey'];
+
+        $attributes     = $this->getAttributesFromCollector($this->dataCollector, $encrypted);
+        $files          = $this->getFilesFromCollector($this->dataCollector);
+        $relationdata   = $this->getRelatedDataFromCollector($this->dataCollector, $encrypted);
 
         try {
             $response = $client->post(route('dataSync.handle', [], false), [
-                'form_params' => [
-                    'connection'    => config('datasync.own_connection'),
-                    'apikey'        => $this->apiKey,
-                    'model'         => $this->syncName,
-                    'identifier'    => $this->identifier,
-                    'action'        => $this->action,
-                    'data'          => $this->encrypted ? encrypt($this->data) : $this->data,
-                    'relationdata'  => $this->relationdata,
+                'headers'   => [
+                    'Content-Type'  => 'multipart/form-data',
                 ],
+                'multipart' => array_merge(
+                    [
+                        [
+                            'name'      => 'connection',
+                            'contents'  => config('datasync.own_connection'),
+                        ],
+                        [
+                            'name'      => 'apikey',
+                            'contents'  => $apiKey,
+                        ],
+                        [
+                            'name'      => 'encrypted',
+                            'contents'  => $encrypted,
+                        ],
+                        [
+                            'name'      => 'model',
+                            'contents'  => $this->dataCollector->getSyncName(),
+                        ],
+                        [
+                            'name'      => 'identifier',
+                            'contents'  => $this->dataCollector->getIdentifier(),
+                        ],
+                        [
+                            'name'      => 'action',
+                            'contents'  => $this->dataCollector->getAction(),
+                        ],
+                        [
+                            'name'      => 'data',
+                            'contents'  => $attributes,
+                        ],
+                        [
+                            'name'      => 'relationdata',
+                            'contents'  => $relationdata,
+                        ],
+                    ],
+                    $files
+                ),
             ]);
 
-            if ($response->getStatusCode() === 200 || $response->getStatusCode === 201) {
-                if ($this->shouldLog) {
-                    DataSyncLog::succeeded($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection);
+            if (in_array($response->getStatusCode(), [200, 201])) {
+                if ($this->dataCollector->shouldLog()) {
+                    DataSyncLog::succeeded($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection);
                 }
             }
         } catch (RequestException $e) {
             // errors always get logged
-            DataSyncLog::failed($this->action, $this->syncName, $this->identifier, $this->dataSyncConnection, $this->data, $e->getResponse());
+            DataSyncLog::failed($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $attributes, $e->getResponse());
 
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $e->getResponse()->getStatusCode() . "): " . $e->getResponse()->getReasonPhrase());
         } catch (\Exception $e) {
             throw new DataSyncRequestFailedException("DataSync Request failed with Exception: " . $e->getMessage());
         }
+    }
+
+    protected function getAttributesFromCollector(DataSyncCollector $collector, $encrypted) {
+        return $collector
+            ->getAttributes()
+            ->when($encrypted, function ($attributes) {
+                return $attributes->mapWithKeys(function ($attribute, $key) {
+                    return [$key => encrypt($attribute)];
+                });
+            })
+            ->toArray();
+    }
+
+    protected function getFilesFromCollector(DataSyncCollector $collector) {
+        return $collector
+            ->getFiles()
+            ->map(function ($file, $name) {
+                if (!file_exists($file['path'])) {
+                    return null;
+                }
+
+                return array_merge(
+                    [
+                        'name'      => 'files[' . $name . ']',
+                        'contents'  => fopen($file['path'], 'r'),
+                    ],
+                    !empty($file['fileName']) ? ['filename' => $file['fileName']] : [],
+                    !empty($file['mimeType']) ? ['headers' => ['Content-Type' => $file['mimeType']]] : []
+                );
+            })
+            ->filter(function ($file) {
+                return !empty($file);
+            })
+            ->toArray();
+    }
+
+    protected function getRelatedDataFromCollector(DataSyncCollector $collector, $encrypted) {
+        return $collector
+            ->getRelatedData()
+            ->when($encrypted, function ($relations) {
+                // TODO: implement encryption
+                return $relations;
+            })
+            ->toArray();
     }
 }
