@@ -48,39 +48,6 @@ class HandleDataSync implements ShouldQueue {
         $files          = $this->getFilesFromCollector($this->dataCollector);
         $relationdata   = $this->getRelatedDataFromCollector($this->dataCollector, $encrypted);
 
-        print_r(array_merge(
-            [
-                [
-                    'name'      => 'connection',
-                    'contents'  => config('datasync.own_connection'),
-                ],
-                [
-                    'name'      => 'apikey',
-                    'contents'  => $apiKey,
-                ],
-                [
-                    'name'      => 'encrypted',
-                    'contents'  => $encrypted,
-                ],
-                [
-                    'name'      => 'model',
-                    'contents'  => $this->dataCollector->getSyncName(),
-                ],
-                [
-                    'name'      => 'identifier',
-                    'contents'  => $this->dataCollector->getIdentifier(),
-                ],
-                [
-                    'name'      => 'action',
-                    'contents'  => (string)$this->dataCollector->getAction(),
-                ],
-            ],
-            $attributes,
-            $relationdata,
-            $files
-        ));
-        exit;
-
         try {
             $response = $client->post(route('dataSync.handle', [], false), [
                 'multipart' => array_merge(
