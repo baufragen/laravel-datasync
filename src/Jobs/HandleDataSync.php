@@ -50,6 +50,9 @@ class HandleDataSync implements ShouldQueue {
 
         try {
             $response = $client->post(route('dataSync.handle', [], false), [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
                 'multipart' => array_merge(
                     [
                         [
