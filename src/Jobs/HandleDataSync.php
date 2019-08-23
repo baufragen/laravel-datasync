@@ -48,6 +48,39 @@ class HandleDataSync implements ShouldQueue {
         $files          = $this->getFilesFromCollector($this->dataCollector);
         $relationdata   = $this->getRelatedDataFromCollector($this->dataCollector, $encrypted);
 
+        print_r(array_merge(
+            [
+                [
+                    'name'      => 'connection',
+                    'contents'  => config('datasync.own_connection'),
+                ],
+                [
+                    'name'      => 'apikey',
+                    'contents'  => $apiKey,
+                ],
+                [
+                    'name'      => 'encrypted',
+                    'contents'  => $encrypted,
+                ],
+                [
+                    'name'      => 'model',
+                    'contents'  => $this->dataCollector->getSyncName(),
+                ],
+                [
+                    'name'      => 'identifier',
+                    'contents'  => $this->dataCollector->getIdentifier(),
+                ],
+                [
+                    'name'      => 'action',
+                    'contents'  => (string)$this->dataCollector->getAction(),
+                ],
+            ],
+            $attributes,
+            $relationdata,
+            $files
+        ));
+        exit;
+
         try {
             $response = $client->post(route('dataSync.handle', [], false), [
                 'multipart' => array_merge(
@@ -74,17 +107,11 @@ class HandleDataSync implements ShouldQueue {
                         ],
                         [
                             'name'      => 'action',
-                            'contents'  => $this->dataCollector->getAction(),
-                        ],
-                        [
-                            'name'      => 'data',
-                            'contents'  => $attributes,
-                        ],
-                        [
-                            'name'      => 'relationdata',
-                            'contents'  => $relationdata,
+                            'contents'  => (string)$this->dataCollector->getAction(),
                         ],
                     ],
+                    $attributes,
+                    $relationdata,
                     $files
                 ),
             ]);
@@ -110,6 +137,12 @@ class HandleDataSync implements ShouldQueue {
                 return $attributes->mapWithKeys(function ($attribute, $key) {
                     return [$key => encrypt($attribute)];
                 });
+            })
+            ->map(function ($value, $key) {
+                return [
+                    'name' => 'data[' . $key . ']',
+                    'contents' => $value,
+                ];
             })
             ->toArray();
     }
@@ -141,6 +174,12 @@ class HandleDataSync implements ShouldQueue {
             ->when($encrypted, function ($relations) {
                 // TODO: implement encryption
                 return $relations;
+            })
+            ->map(function ($value, $relation) {
+                return [
+                    'name' => 'relationdata[' . $relation . ']',
+                    'contents' => $value,
+                ];
             })
             ->toArray();
     }
