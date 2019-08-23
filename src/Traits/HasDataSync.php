@@ -15,7 +15,7 @@ trait HasDataSync {
     public static function bootHasDataSync() {
 
         static::created(function ($model) {
-            if ($model->dataSyncEnabled) {
+            if ($model->dataSyncEnabled && !app()->environment('testing')) {
                 /** @var DataSyncCollector $collector */
                 $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
                 $collector
@@ -28,9 +28,9 @@ trait HasDataSync {
         });
 
         static::updated(function ($model) {
-            if ($model->dataSyncEnabled) {
+            if ($model->dataSyncEnabled && !app()->environment('testing')) {
                 /** @var DataSyncCollector $collector */
-                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
+                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::UPDATE));
                 $collector
                     ->initForModel($model)
                     ->identifier($model->id);
@@ -41,9 +41,9 @@ trait HasDataSync {
         });
 
         static::deleted(function ($model) {
-            if ($model->dataSyncEnabled) {
+            if ($model->dataSyncEnabled && !app()->environment('testing')) {
                 /** @var DataSyncCollector $collector */
-                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
+                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::DELETE));
                 $collector
                     ->initForModel($model)
                     ->identifier($model->id);
