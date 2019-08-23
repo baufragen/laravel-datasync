@@ -47,7 +47,7 @@ class DataSyncTransformer {
         $this->validate($this->attributes, $this->model);
     }
 
-    protected function validate($data, HasDataSync2 $model) {
+    protected function validate($data, $model) {
         if (method_exists($model, "validateDataSync")) {
             if (!$model->validateDataSync($data)) {
                 // TODO: handle failed validation (exception)
