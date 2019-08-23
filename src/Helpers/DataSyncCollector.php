@@ -31,7 +31,7 @@ class DataSyncCollector {
      * @param HasDataSync $model
      * @return DataSyncCollector $this
      */
-    public function initForModel(HasDataSync $model) {
+    public function initForModel($model) {
         $this->syncName         = $model->getSyncName();
         $this->attributes       = $model->getSyncedAttributeData();
         $this->loggingEnabled   = $model->dataSyncShouldBeLogged();
