@@ -19,7 +19,8 @@ trait HasDataSync {
                 /** @var DataSyncCollector $collector */
                 $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
                 $collector
-                    ->initForModel($model);
+                    ->initForModel($model)
+                    ->identifier($model->id);
                 $model->beforeDataSync($collector);
 
                 HandleDataSync::dispatch($collector);
