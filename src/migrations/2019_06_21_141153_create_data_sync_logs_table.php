@@ -23,6 +23,7 @@ class CreateDataSyncLogsTable extends Migration
                 ->comment('Which model type was synced?');
 
             $table->bigInteger('identifier')
+                ->nullable()
                 ->comment('Which model was synced exactly?');
 
             $table->string('action')
