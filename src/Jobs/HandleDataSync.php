@@ -144,6 +144,7 @@ class HandleDataSync implements ShouldQueue {
                     'contents' => $value,
                 ];
             })
+            ->values()
             ->toArray();
     }
 
@@ -181,6 +182,7 @@ class HandleDataSync implements ShouldQueue {
                     'contents' => $value,
                 ];
             })
+            ->values()
             ->toArray();
     }
 }
