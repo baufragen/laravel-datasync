@@ -35,7 +35,7 @@ class HandleDataSync implements ShouldQueue {
     protected function syncToConnection($connection) {
         $client = new DataSyncClient($connection);
 
-        $config = config('connections.' . $connection);
+        $config = config('datasync.connections.' . $connection);
 
         if (empty($config)) {
             throw new ConfigNotFoundException("Config not found for connection " . $connection);
