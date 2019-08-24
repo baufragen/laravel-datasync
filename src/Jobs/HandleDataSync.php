@@ -175,7 +175,7 @@ class HandleDataSync implements ShouldQueue {
             ->map(function ($datasets, $action) {
                 return $datasets->map(function ($dataset, $index) use ($action) {
                     return [
-                        'name' => 'customaction[' . $action . '][' . $index . ']',
+                        'name' => 'customactions[' . $action . '][' . $index . ']',
                         'contents' => $dataset,
                     ];
                 });
