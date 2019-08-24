@@ -44,6 +44,8 @@ class DataSyncCollector {
             $this->connections  = collect(config('datasync.connections'))->keys();
         }
 
+        $this->customActions    = $model->getCustomDataSyncActions();
+
         return $this;
     }
 

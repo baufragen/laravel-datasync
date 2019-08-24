@@ -11,6 +11,7 @@ use Baufragen\DataSync\Jobs\HandleDataSync;
 trait HasDataSync {
 
     protected $dataSyncEnabled = true;
+    protected $dataSyncCustomActions = [];
 
     public static function bootHasDataSync() {
 
@@ -247,6 +248,20 @@ trait HasDataSync {
 
     protected function removeChangedRelationship($relation, $change) {
         $this->{$relation}()->detach($change['id']);
+    }
+
+    public function customDataSyncAction($action, $data) {
+        if (!isset($this->dataSyncCustomActions[$action])) {
+            $this->dataSyncCustomActions[$action] = collect([]);
+        }
+
+        $this->dataSyncCustomActions[$action]->push($data);
+
+        return $this;
+    }
+
+    public function getCustomDataSyncActions() {
+        return $this->dataSyncCustomActions;
     }
 
 }
