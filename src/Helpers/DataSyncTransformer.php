@@ -14,6 +14,7 @@ class DataSyncTransformer {
     protected $attributes;
     protected $files;
     protected $relations;
+    protected $customActions;
 
     public function __construct(Request $request) {
         $this->request  = $request;
@@ -37,12 +38,17 @@ class DataSyncTransformer {
         return $this->files;
     }
 
+    public function getCustomActions() {
+        return $this->customActions;
+    }
+
     protected function transformData(Request $request) {
         $this->action       = $this->getActionFromRequest($request);
         $this->model        = $this->getModelFromRequest($request);
         $this->attributes   = $this->getAttributesFromRequest($request);
         $this->files        = $this->getFilesFromRequest($request);
         $this->relations    = $this->getRelationsFromRequest($request);
+        $this->customActions = $this->getCustomActionsFromRequest($request);
 
         $this->validate($this->attributes, $this->model);
     }
@@ -73,7 +79,7 @@ class DataSyncTransformer {
             return null;
         }
 
-        return collect($request->get('files'))
+        return collect($request->file('files'))
             ->mapWithKeys(function ($file, $key) {
                 return [$key => $file];
             })
@@ -86,6 +92,25 @@ class DataSyncTransformer {
         }
 
         return $request->get('relationdata');
+    }
+
+    protected function getCustomActionsFromRequest(Request $request) {
+        if (!$request->filled('customactions')) {
+            return null;
+        }
+
+        return collect($request->get('customactions', []))
+            ->when($request->get('encrypted', false), function ($customActions) {
+                return $customActions->mapWithKeys(function ($datasets, $action) {
+                    return [
+                        $action => collect($datasets)->map(function($dataset) {
+                            return json_decode(decrypt($dataset), true);
+                        })
+                        ->toArray()
+                    ];
+                });
+            })
+            ->toArray();
     }
 
     protected function getActionFromRequest(Request $request) {

@@ -9,6 +9,7 @@ class DataSyncCollector {
     protected $action;
     protected $files;
     protected $relatedData;
+    protected $customActions;
     protected $attributes;
     protected $connections;
 
@@ -21,6 +22,7 @@ class DataSyncCollector {
         $this->files        = collect([]);
         $this->relatedData  = collect([]);
         $this->attributes   = collect([]);
+        $this->customActions= collect([]);
         $this->connections  = collect([]);
     }
 
@@ -73,6 +75,24 @@ class DataSyncCollector {
             'fileName' => $fileName,
             'mimeType' => $mimeType,
         ];
+
+        return $this;
+    }
+
+    /**
+     * Allows the user to add a custom action (for example the deletion of a file)
+     * to the sync process.
+     *
+     * @param string $action
+     * @param mixed $data
+     * @return DataSyncCollector $this
+     */
+    public function customAction($action, $data) {
+        if (!isset($this->customActions[$action])) {
+            $this->customActions[$action] = collect([]);
+        }
+
+        $this->customActions[$action]->push($data);
 
         return $this;
     }
@@ -164,6 +184,10 @@ class DataSyncCollector {
 
     public function getRelatedData() {
         return $this->relatedData;
+    }
+
+    public function getCustomActions() {
+        return $this->customActions;
     }
 
     public function getAction() {

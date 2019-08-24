@@ -47,6 +47,7 @@ class HandleDataSync implements ShouldQueue {
         $attributes     = $this->getAttributesFromCollector($this->dataCollector, $encrypted);
         $files          = $this->getFilesFromCollector($this->dataCollector);
         $relationdata   = $this->getRelatedDataFromCollector($this->dataCollector, $encrypted);
+        $customActions  = $this->getCustomActionsFromCollector($this->dataCollector, $encrypted);
 
         try {
             $response = $client->post(route('dataSync.handle', [], false), [
@@ -82,7 +83,8 @@ class HandleDataSync implements ShouldQueue {
                     ],
                     $attributes,
                     $relationdata,
-                    $files
+                    $files,
+                    $customActions
                 ),
             ]);
 
@@ -152,6 +154,33 @@ class HandleDataSync implements ShouldQueue {
                     'contents' => $value,
                 ];
             })
+            ->values()
+            ->toArray();
+    }
+
+    protected function getCustomActionsFromCollector(DataSyncCollector $collector, $encrypted) {
+        return collect($collector->getCustomActions())
+            ->map(function ($datasets) {
+                return $datasets->map(function($dataset) {
+                    return json_encode($dataset);
+                });
+            })
+            ->when($encrypted, function ($actions) {
+                return $actions->map(function ($datasets) {
+                    return $datasets->map(function($dataset) {
+                        return encrypt($dataset);
+                    });
+                });
+            })
+            ->map(function ($datasets, $action) {
+                return $datasets->map(function ($dataset, $index) use ($action) {
+                    return [
+                        'name' => 'customaction[' . $action . '][' . $index . ']',
+                        'contents' => $dataset,
+                    ];
+                });
+            })
+            ->flatten(1)
             ->values()
             ->toArray();
     }

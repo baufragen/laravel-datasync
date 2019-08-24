@@ -23,8 +23,9 @@ class DataSyncController extends BaseController {
             'data'          => 'nullable',
             'action'        => 'required',
             'relationdata'  => 'nullable',
-            'files'         => 'nullable',
+            'files'         => 'nullable|array',
             'files.*'       => 'file',
+            'customactions' => 'nullable|array',
         ]);
 
         try {

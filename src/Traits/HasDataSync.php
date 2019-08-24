@@ -136,6 +136,9 @@ trait HasDataSync {
         $files = $this->beforeDataSyncFilesUpdate($transformer->getFiles());
         $this->executeFilesDataSync($files);
 
+        $customActions = $this->beforeDataSyncCustomActionsUpdate($transformer->getCustomActions());
+        $this->executeCustomActionsDataSync($customActions);
+
         $this->enableDataSync();
     }
 
@@ -175,6 +178,16 @@ trait HasDataSync {
      */
     protected function beforeDataSyncFilesUpdate($files) {
         return $files;
+    }
+
+    /**
+     * Can be overwritten to change custom actions before the update is handled.
+     *
+     * @param array $customActions
+     * @return array
+     */
+    protected function beforeDataSyncCustomActionsUpdate($customActions) {
+        return $customActions;
     }
 
     protected function executeAttributeDataSync($attributes) {
@@ -217,6 +230,10 @@ trait HasDataSync {
     }
 
     protected function executeFilesDataSync($files) {
+        return;
+    }
+
+    protected function executeCustomActionsDataSync($customActions) {
         return;
     }
 
