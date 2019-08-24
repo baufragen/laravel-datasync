@@ -129,16 +129,22 @@ trait HasDataSync {
         $this->disableDataSync();
 
         $attributes = $this->beforeDataSyncAttributeUpdate($transformer->getAttributes());
-        $this->executeAttributeDataSync($attributes);
+        if (!empty($attributes)) {
+            $this->executeAttributeDataSync($attributes);
+        }
 
         $relationData = $this->beforeDataSyncRelationUpdate($transformer->getRelations());
         $this->executeRelationDataSync($relationData);
 
         $files = $this->beforeDataSyncFilesUpdate($transformer->getFiles());
-        $this->executeFilesDataSync($files);
+        if (!empty($files)) {
+            $this->executeFilesDataSync($files);
+        }
 
         $customActions = $this->beforeDataSyncCustomActionsUpdate($transformer->getCustomActions());
-        $this->executeCustomActionsDataSync($customActions);
+        if (!empty($customActions)) {
+            $this->executeCustomActionsDataSync($customActions);
+        }
 
         $this->enableDataSync();
     }
