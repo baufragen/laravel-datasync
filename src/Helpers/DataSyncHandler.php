@@ -13,9 +13,14 @@ class DataSyncHandler {
     }
 
     public function getCollectorForModel(DataSyncing $model, $action = DataSyncAction::UPDATE) {
-        return $this->dataCollectors[$model->getSyncName()]->filter(function ($collectionModel) use ($model) {
+        if (!empty($this->dataCollectors[$model->getSyncName()])) {
+            if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collectionModel) use ($model) {
                 return $collectionModel->is($model);
-            })->first() ?? $this->createDataCollectorForModel($model, $action);
+            })->first()) {
+                return $collector;
+            }
+        }
+        return $this->createDataCollectorForModel($model, $action);
     }
 
     public function hasOpenSyncs() {
@@ -23,6 +28,10 @@ class DataSyncHandler {
     }
 
     public function dispatch() {
+        if (app()->environment('testing')) {
+            return;
+        }
+
         $this->dataCollectors->each(function ($collectors) {
             $collectors->each(function ($collector) {
                 HandleDataSync::dispatch($collector);
