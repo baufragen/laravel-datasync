@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Helpers;
 
+use Baufragen\DataSync\Interfaces\DataSyncing;
 use Baufragen\DataSync\Traits\HasDataSync2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -126,7 +127,7 @@ class DataSyncTransformer {
             $model = new $modelClass();
         }
 
-        if (!method_exists($model, "getSyncedAttributeData")) {
+        if (!$model instanceof DataSyncing) {
             abort(500, "Class " . $modelClass . " does not implement HasDataSync trait");
         }
 

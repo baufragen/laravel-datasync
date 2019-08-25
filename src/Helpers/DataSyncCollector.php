@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Helpers;
 
+use Baufragen\DataSync\Interfaces\DataSyncing;
 use Baufragen\DataSync\Traits\HasDataSync;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
@@ -33,7 +34,7 @@ class DataSyncCollector {
      * @param HasDataSync $model
      * @return DataSyncCollector $this
      */
-    public function initForModel($model) {
+    public function initForModel(DataSyncing $model) {
         $this->syncName         = $model->getSyncName();
         $this->attributes       = $model->getSyncedAttributeData();
         $this->loggingEnabled   = $model->dataSyncShouldBeLogged();
@@ -45,6 +46,19 @@ class DataSyncCollector {
         }
 
         $this->customActions    = $model->getCustomDataSyncActions();
+
+        return $this;
+    }
+
+    /**
+     * Allows additional attributes to be synced
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return DataSyncCollector $this
+     */
+    public function addAttribute($name, $value) {
+        $this->attributes[$name] = $value;
 
         return $this;
     }

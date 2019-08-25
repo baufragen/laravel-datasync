@@ -6,7 +6,6 @@ use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Helpers\DataSyncCollector;
 use Baufragen\DataSync\Helpers\DataSyncTransformer;
-use Baufragen\DataSync\Jobs\HandleDataSync;
 
 trait HasDataSync {
 
@@ -17,40 +16,19 @@ trait HasDataSync {
 
         static::created(function ($model) {
             if ($model->dataSyncEnabled && !app()->environment('testing')) {
-                /** @var DataSyncCollector $collector */
-                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::CREATE));
-                $collector
-                    ->initForModel($model)
-                    ->identifier($model->id);
-                $model->beforeDataSync($collector);
-
-                HandleDataSync::dispatch($collector);
+                $model->beforeDataSync(dataSync($model, DataSyncAction::CREATE));
             }
         });
 
         static::updated(function ($model) {
             if ($model->dataSyncEnabled && !app()->environment('testing')) {
-                /** @var DataSyncCollector $collector */
-                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::UPDATE));
-                $collector
-                    ->initForModel($model)
-                    ->identifier($model->id);
-                $model->beforeDataSync($collector);
-
-                HandleDataSync::dispatch($collector);
+                $model->beforeDataSync(dataSync($model, DataSyncAction::UPDATE));
             }
         });
 
         static::deleted(function ($model) {
             if ($model->dataSyncEnabled && !app()->environment('testing')) {
-                /** @var DataSyncCollector $collector */
-                $collector = new DataSyncCollector(new DataSyncAction(DataSyncAction::DELETE));
-                $collector
-                    ->initForModel($model)
-                    ->identifier($model->id);
-                $model->beforeDataSync($collector);
-
-                HandleDataSync::dispatch($collector);
+                $model->beforeDataSync(dataSync($model, DataSyncAction::DELETE));
             }
         });
 
