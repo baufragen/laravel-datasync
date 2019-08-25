@@ -12,7 +12,7 @@ class DataSyncHandler {
         $this->dataCollectors = collect([]);
     }
 
-    public function getCollectorForModel(DataSyncing $model, $action = DataSyncAction::UPDATE) {
+    public function getCollectorForModel(DataSyncing $model, DataSyncAction $action) {
         if (!empty($this->dataCollectors[$model->getSyncName()])) {
             if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collectionModel) use ($model) {
                 return $collectionModel->is($model);
@@ -39,7 +39,7 @@ class DataSyncHandler {
         });
     }
 
-    protected function createDataCollectorForModel(DataSyncing $model, $action) {
+    protected function createDataCollectorForModel(DataSyncing $model, DataSyncAction $action) {
         if (!isset($this->dataCollectors[$model->getSyncName()])) {
             $this->dataCollectors[$model->getSyncName()] = collect([]);
         }
