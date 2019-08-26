@@ -94,10 +94,13 @@ class DataSyncTransformer {
 
         return collect($request->get('relationdata'))
             ->when($request->get('encrypted', false), function ($relations) {
-                return decrypt($relations);
+                return $relations
+                    ->map(function ($relation) {
+                        return decrypt($relation);
+                    });
             })
-            ->mapWithKeys(function ($relation) {
-                return [$relation['name'] => json_decode($relation['contents'], true)];
+            ->mapWithKeys(function ($data, $relation) {
+                return [$relation => json_decode($data, true)];
             })
             ->toArray();
     }
