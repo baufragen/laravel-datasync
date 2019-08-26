@@ -153,6 +153,7 @@ class HandleDataSync implements ShouldQueue {
             ->when($encrypted, function ($relations) {
                 return $relations->map(function ($relation) {
                     $relation['contents'] = encrypt($relation['contents']);
+                    return $relation;
                 });
             })
             ->values()
