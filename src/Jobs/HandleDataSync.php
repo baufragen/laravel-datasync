@@ -144,15 +144,16 @@ class HandleDataSync implements ShouldQueue {
 
     protected function getRelatedDataFromCollector(DataSyncCollector $collector, $encrypted) {
         return collect($collector->getRelatedData())
-            ->when($encrypted, function ($relations) {
-                // TODO: implement encryption
-                return $relations;
-            })
             ->map(function ($value, $relation) {
                 return [
                     'name' => 'relationdata[' . $relation . ']',
-                    'contents' => $value,
+                    'contents' => json_encode($value),
                 ];
+            })
+            ->when($encrypted, function ($relations) {
+                return $relations->map(function ($relation) {
+                    $relation['contents'] = encrypt($relation['contents']);
+                });
             })
             ->values()
             ->toArray();
