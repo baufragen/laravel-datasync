@@ -223,15 +223,25 @@ trait HasDataSync {
     }
 
     protected function addChangedRelationship($relation, $change) {
-        $this->{$relation}()->attach($change['id'], $change['pivot']);
+        if (!$this->checkExistingRelationship($relation, $change['id'])) {
+            $this->{$relation}()->attach($change['id'], $change['pivot']);
+        }
     }
 
     protected function updateChangedRelationship($relation, $change) {
-        $this->{$relation}()->updateExistingPivot($change['id'], $change['pivot']);
+        if ($this->checkExistingRelationship($relation, $change['id'])) {
+            $this->{$relation}()->updateExistingPivot($change['id'], $change['pivot']);
+        } else {
+            $this->addChangedRelationship($relation, $change);
+        }
     }
 
     protected function removeChangedRelationship($relation, $change) {
         $this->{$relation}()->detach($change['id']);
+    }
+
+    protected function checkExistingRelationship($relation, $id) {
+        return $this->{$relation}()->where('id', $id)->exists();
     }
 
     public function customDataSyncAction($action, $data) {
