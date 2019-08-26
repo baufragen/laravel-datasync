@@ -18,6 +18,8 @@ class DataSyncCollector {
     protected $syncName         = null;
     protected $loggingEnabled   = true;
 
+    protected $model            = null;
+
     public function __construct(DataSyncAction $action) {
         $this->action = $action;
         $this->files        = collect([]);
@@ -35,6 +37,7 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function initForModel(DataSyncing $model) {
+        $this->model = $model;
         $this->syncName         = $model->getSyncName();
         $this->identifier($model->id);
         $this->attributes       = $model->getSyncedAttributeData();
@@ -209,6 +212,10 @@ class DataSyncCollector {
 
     public function getAction() {
         return $this->action;
+    }
+
+    public function getModel() {
+        return $this->model;
     }
 
     public function shouldLog() {

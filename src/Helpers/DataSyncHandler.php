@@ -14,8 +14,8 @@ class DataSyncHandler {
 
     public function getCollectorForModel(DataSyncing $model, DataSyncAction $action) {
         if (!empty($this->dataCollectors[$model->getSyncName()])) {
-            if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collectionModel) use ($model) {
-                return $collectionModel->is($model);
+            if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collector) use ($model) {
+                return $collector->getModel()->is($model) ?? false;
             })->first()) {
                 return $collector;
             }

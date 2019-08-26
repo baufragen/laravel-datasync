@@ -128,7 +128,7 @@ class DataSyncTransformer {
         }
 
         if (!$model instanceof DataSyncing) {
-            abort(500, "Class " . $modelClass . " does not implement HasDataSync trait");
+            abort(500, "Class " . $modelClass . " does not implement DataSyncing interface");
         }
 
         return $model;
