@@ -236,8 +236,8 @@ trait HasDataSync {
         }
     }
 
-    protected function removeChangedRelationship($relation, $change) {
-        $this->{$relation}()->detach($change['id']);
+    protected function removeChangedRelationship(string $relation, int $id) {
+        $this->{$relation}()->detach($id);
     }
 
     protected function checkExistingRelationship($relation, $id) {
