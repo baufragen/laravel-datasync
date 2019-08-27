@@ -37,6 +37,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function initForModel(DataSyncing $model) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->model = $model;
         $this->syncName         = $model->getSyncName();
         $this->identifier($model->id);
@@ -62,6 +66,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function addAttribute($name, $value) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->attributes[$name] = $value;
 
         return $this;
@@ -78,6 +86,10 @@ class DataSyncCollector {
      * @throws \Exception
      */
     public function file($name, $path, $fileName = null, $mimeType = null) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         if (!file_exists($path)) {
             throw new \Exception("File " . $path . " doesn't exist");
         }
@@ -108,6 +120,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function customAction($action, $data) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         if (!isset($this->customActions[$action])) {
             $this->customActions[$action] = collect([]);
         }
@@ -126,6 +142,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function addRelation($relation, $id, $pivotData = []) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->checkRelationExists($relation);
 
         $this->relatedData[$relation]['add']->push([
@@ -145,6 +165,10 @@ class DataSyncCollector {
      * @return DataSyncCollector$this
      */
     public function updateRelation($relation, $id, $pivotData = []) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->checkRelationExists($relation);
 
         $this->relatedData[$relation]['update']->push([
@@ -163,6 +187,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function removeRelation($relation, $id) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->checkRelationExists($relation);
 
         $this->relatedData[$relation]['remove']->push($id);
@@ -177,6 +205,10 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function identifier($id) {
+        if (app()->environment('testing')) {
+            return $this;
+        }
+
         $this->identifier = $id;
 
         return $this;
