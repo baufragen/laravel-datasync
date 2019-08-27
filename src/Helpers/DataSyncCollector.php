@@ -37,11 +37,12 @@ class DataSyncCollector {
      * @return DataSyncCollector $this
      */
     public function initForModel(DataSyncing $model) {
+        $this->model = $model;
+
         if (app()->environment('testing')) {
             return $this;
         }
 
-        $this->model = $model;
         $this->syncName         = $model->getSyncName();
         $this->identifier($model->id);
         $this->attributes       = $model->getSyncedAttributeData();
