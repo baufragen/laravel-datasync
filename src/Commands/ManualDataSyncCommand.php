@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Commands;
 
+use Baufragen\DataSync\Interfaces\DataSyncing;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -12,18 +13,19 @@ class ManualDataSyncCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $signature = 'datasync:manual-sync {--debug} {-model=}';
+	protected $signature = 'datasync:manual-sync {--debug} {-model=} {-id=}';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Creates a report for manufacturer landingpage visits';
+	protected $description = 'Starts a syncing process for either the given model or for all models';
 
     protected $debug = false;
 
     protected $models = null;
+    protected $ids = null;
 
     /**
 	 * Execute the console command.
@@ -37,7 +39,18 @@ class ManualDataSyncCommand extends Command {
         $model = $this->argument('model', null);
         if ($model) {
             $this->info('Limiting synced models to ' . $model);
-            $this->models = explode(",", $model);
+            $this->models = collect(explode(",", $model));
+        }
+
+        $id = $this->argument('id', null);
+        if ($id) {
+            if (!$model) {
+                $this->error('Cannot use id parameter without model parameter');
+                return;
+            }
+
+            $this->info('Limiting syncing to ID(s): ' . $id);
+            $this->ids = collect(explode(",", $id));
         }
 
         if ($this->debug) {
@@ -70,43 +83,46 @@ class ManualDataSyncCommand extends Command {
             })
             ->each(function ($modelClass) {
 
-            $this->verboseInfo('====================');
-            $this->verboseInfo('Syncing ' . $modelClass);
-            $this->verboseInfo('====================');
+                $this->verboseInfo('====================');
+                $this->verboseInfo('Syncing ' . $modelClass);
+                $this->verboseInfo('====================');
 
-            // for every model, get all instances (possibly chunked to save memory)
-            $modelClass::chunk(100, function ($entities) use ($modelClass) {
+                if ($this->ids) {
+                    $this->ids->each(function($id) use ($modelClass) {
+                        $entity = $modelClass::find($id);
 
-                $entities->each(function ($entity) use ($modelClass) {
-
-                    try {
-                        // for every instance check if the last successful sync log is more than ~5 seconds before the updated_at
-                        if ($entity->needsInitialDataSync()) {
-
-                            if (!$this->debug) {
-                                $entity->triggerInitialDataSync();
-                            }
-                            $this->verboseInfo('Triggered initial data sync for ' . $modelClass . ' [' . $entity->id . ']');
+                        if (!$entity) {
+                            $this->error('Could not find ' . $modelClass . '[' . $id . ']');
                             return;
-
-                        } else if ($entity->needsManualDataSync()) {
-
-                            if (!$this->debug) {
-                                $entity->triggerManualDataSync();
-                            }
-                            $this->verboseInfo('Triggered manual data sync for ' . $modelClass . '[' . $entity->id . ']');
-                            return;
-
                         }
-                    } catch (\Exception $e) {
-                        $this->error('Error during sync for ' . $modelClass . ' [' . $entity->id . ']: ' . $e->getMessage());
-                    }
 
-                });
-            });
+                        $this->triggerSync($entity);
+                    });
+                } else {
+                    // for every model, get all instances (possibly chunked to save memory)
+                    $modelClass::chunk(100, function ($entities) use ($modelClass) {
 
+                        $entities->each(function ($entity) use ($modelClass) {
+
+                            try {
+
+                                $this->triggerSync($entity);
+
+                            } catch (\Exception $e) {
+                                $this->error('Error during sync for ' . $modelClass . ' [' . $entity->id . ']: ' . $e->getMessage());
+                            }
+
+                        });
+                    });
+                }
         });
+
+        app('dataSync.handler')->dispatch();
 	}
+
+	protected function triggerSync(DataSyncing $entity) {
+        $this->verboseInfo('Syncing model ' . get_class($entity) . ' #' . $entity->id);
+    }
 
 	protected function verboseInfo($info) {
         if ($this->getOutput()->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
