@@ -63,7 +63,7 @@ class ManualDataSyncCommand extends Command {
         // get all syncable models
         $models = config('datasync.models');
         if ($models) {
-            $models = collect(array_keys($models));
+            $models = collect($models);
         }
 
         if (!$models) {
@@ -75,13 +75,14 @@ class ManualDataSyncCommand extends Command {
         $models
             // filter models by argument first
             // if no argument is set -> allow all models
-            ->filter(function ($class, $syncName) {
+            ->filter(function ($syncName) {
                 if (!$this->models) {
                     return true;
                 }
 
                 return in_array($syncName, $this->models->toArray());
             })
+            ->keys()
             ->each(function ($modelClass) {
 
                 $this->verboseInfo('====================');
