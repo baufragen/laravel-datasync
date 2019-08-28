@@ -79,7 +79,7 @@ class ManualDataSyncCommand extends Command {
                     return true;
                 }
 
-                return in_array($model, $this->models);
+                return in_array($model, $this->models->toArray());
             })
             ->each(function ($modelClass) {
 
