@@ -50,52 +50,54 @@ class HandleDataSync implements ShouldQueue {
         $customActions  = $this->getCustomActionsFromCollector($this->dataCollector, $encrypted);
 
         try {
+            $payload = array_merge(
+                [
+                    [
+                        'name'      => 'connection',
+                        'contents'  => config('datasync.own_connection'),
+                    ],
+                    [
+                        'name'      => 'apikey',
+                        'contents'  => $apiKey,
+                    ],
+                    [
+                        'name'      => 'encrypted',
+                        'contents'  => $encrypted,
+                    ],
+                    [
+                        'name'      => 'model',
+                        'contents'  => $this->dataCollector->getSyncName(),
+                    ],
+                    [
+                        'name'      => 'identifier',
+                        'contents'  => $this->dataCollector->getIdentifier(),
+                    ],
+                    [
+                        'name'      => 'action',
+                        'contents'  => (string)$this->dataCollector->getAction(),
+                    ],
+                ],
+                $attributes,
+                $relationdata,
+                $files,
+                $customActions
+            );
+
             $response = $client->post(route('dataSync.handle', [], false), [
                 'headers' => [
                     'Accept' => 'application/json',
                 ],
-                'multipart' => array_merge(
-                    [
-                        [
-                            'name'      => 'connection',
-                            'contents'  => config('datasync.own_connection'),
-                        ],
-                        [
-                            'name'      => 'apikey',
-                            'contents'  => $apiKey,
-                        ],
-                        [
-                            'name'      => 'encrypted',
-                            'contents'  => $encrypted,
-                        ],
-                        [
-                            'name'      => 'model',
-                            'contents'  => $this->dataCollector->getSyncName(),
-                        ],
-                        [
-                            'name'      => 'identifier',
-                            'contents'  => $this->dataCollector->getIdentifier(),
-                        ],
-                        [
-                            'name'      => 'action',
-                            'contents'  => (string)$this->dataCollector->getAction(),
-                        ],
-                    ],
-                    $attributes,
-                    $relationdata,
-                    $files,
-                    $customActions
-                ),
+                'multipart' => $payload,
             ]);
 
             if (in_array($response->getStatusCode(), [200, 201])) {
                 if ($this->dataCollector->shouldLog()) {
-                    DataSyncLog::succeeded($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection);
+                    DataSyncLog::succeeded($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $response);
                 }
             }
         } catch (RequestException $e) {
             // errors always get logged
-            DataSyncLog::failed($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $attributes, $e->getResponse());
+            DataSyncLog::failed($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $e->getResponse());
 
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $e->getResponse()->getStatusCode() . "): " . $e->getResponse()->getReasonPhrase());
         } catch (\Exception $e) {

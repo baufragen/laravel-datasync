@@ -16,13 +16,15 @@ class DataSyncLog extends Model
         $query->where('successful', false);
     }
 
-    public static function succeeded($action, $model, $identifier, $connection) {
+    public static function succeeded($action, $model, $identifier, $connection, $payload, $response) {
         return self::create([
             'successful'    => true,
             'action'        => $action,
             'model'         => $model,
             'identifier'    => $identifier,
             'connection'    => $connection,
+            'payload'       => app()->environment('production') ? null : json_encode($payload),
+            'response'      => app()->environment('production') ? $response->getStatusCode() : $response->getBody(),
         ]);
     }
 
@@ -33,7 +35,7 @@ class DataSyncLog extends Model
             'model'         => $model,
             'identifier'    => $identifier,
             'connection'    => $connection,
-            'payload'       => encrypt(json_encode($payload)),
+            'payload'       => app()->environment('production') ? encrypt(json_encode($payload)) : json_encode($payload),
             'response'      => $response->getBody(),
         ]);
     }

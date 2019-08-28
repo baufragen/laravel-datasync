@@ -13,6 +13,10 @@ class DataSyncHandler {
     }
 
     public function getCollectorForModel(DataSyncing $model, DataSyncAction $action) {
+        if (app()->environment('testing')) {
+            return null;
+        }
+
         if (!empty($this->dataCollectors[$model->getSyncName()])) {
             if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collector) use ($model) {
                 return $collector->getModel()->is($model) ?? false;
@@ -28,10 +32,6 @@ class DataSyncHandler {
     }
 
     public function dispatch() {
-        if (app()->environment('testing')) {
-            return;
-        }
-
         $this->dataCollectors->each(function ($collectors) {
             $collectors->each(function ($collector) {
                 HandleDataSync::dispatch($collector);
