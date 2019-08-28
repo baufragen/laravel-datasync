@@ -13,7 +13,7 @@ class ManualDataSyncCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $signature = 'datasync:manual-sync {--debug} {-model=} {-id=}';
+	protected $signature = 'datasync:manual-sync {--debug} {--model=} {--id=}';
 
 	/**
 	 * The console command description.
@@ -36,13 +36,13 @@ class ManualDataSyncCommand extends Command {
 	{
         $this->debug = $this->option('debug');
 
-        $model = $this->argument('model', null);
+        $model = $this->option('model', null);
         if ($model) {
             $this->info('Limiting synced models to ' . $model);
             $this->models = collect(explode(",", $model));
         }
 
-        $id = $this->argument('id', null);
+        $id = $this->option('id', null);
         if ($id) {
             if (!$model) {
                 $this->error('Cannot use id parameter without model parameter');
