@@ -19,11 +19,19 @@
 			"Baufragen\\DataSync\\": "src/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"Baufragen\\DataSync\\Tests": "src/tests/"
+		}
+	},
 	"extra": {
 		"laravel": {
 			"providers": [
 				"Baufragen\\DataSync\\DataSyncServiceProvider"
 			]
 		}
+	},
+	"require-dev": {
+		"orchestra/testbench": "~3.0"
 	}
 }
