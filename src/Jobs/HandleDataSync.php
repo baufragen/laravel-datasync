@@ -107,6 +107,13 @@ class HandleDataSync implements ShouldQueue {
 
     protected function getAttributesFromCollector(DataSyncCollector $collector, $encrypted) {
         return collect($collector->getAttributes())
+            ->map(function ($value) {
+                if (is_bool($value)) {
+                    return "bool:" . (string)$value;
+                }
+
+                return $value;
+            })
             ->when($encrypted, function ($attributes) {
                 return $attributes->mapWithKeys(function ($attribute, $key) {
                     return [$key => encrypt($attribute)];

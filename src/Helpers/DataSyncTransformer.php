@@ -72,6 +72,13 @@ class DataSyncTransformer {
                     return [$key => decrypt($value)];
                 });
             })
+            ->map(function ($value) {
+                if (strpos($value, "bool:") === 0) {
+                    return (bool)substr($value, 5);
+                }
+
+                return $value;
+            })
             ->toArray();
     }
 
