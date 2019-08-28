@@ -139,10 +139,14 @@ class DataSyncTransformer {
         $modelClass = app('dataSync.container')->getClassBySyncName($request->get('model'));
 
         if ($this->action->isUpdate() || $this->action->isDelete()) {
-            $model = $modelClass::findOrFail($request->get('identifier'));
+            if ($this->action->isUpdateOrCreate()) {
+                $model = $modelClass::find($request->get('identifier'));
 
-            if (!$model && $this->action->isUpdateOrCreate()) {
-                $model = new $modelClass();
+                if (!$model && $this->action->isUpdateOrCreate()) {
+                    $model = new $modelClass();
+                }
+            } else {
+                $model = $modelClass::findOrFail($request->get('identifier'));
             }
         } else {
             $model = new $modelClass();
