@@ -45,7 +45,7 @@ class DataSyncCollector {
 
         $this->syncName         = $model->getSyncName();
         $this->identifier($model->id);
-        $this->attributes       = $model->getSyncedAttributeData();
+        $this->attributes       = $model->getDirtySyncedAttributeData();
         $this->loggingEnabled   = $model->dataSyncShouldBeLogged();
 
         if (method_exists($model, 'getSyncedConnections')) {
@@ -57,6 +57,10 @@ class DataSyncCollector {
         $this->customActions    = $model->getCustomDataSyncActions();
 
         return $this;
+    }
+
+    public function completeSync() {
+        $this->attributes       = $this->model->getAllSyncedAttributeData();
     }
 
     /**

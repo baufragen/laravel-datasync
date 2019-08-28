@@ -140,6 +140,10 @@ class DataSyncTransformer {
 
         if ($this->action->isUpdate() || $this->action->isDelete()) {
             $model = $modelClass::findOrFail($request->get('identifier'));
+
+            if (!$model && $this->action->isUpdateOrCreate()) {
+                $model = new $modelClass();
+            }
         } else {
             $model = new $modelClass();
         }

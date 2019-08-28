@@ -6,6 +6,7 @@ class DataSyncAction {
     const CREATE = 'create';
     const UPDATE = 'update';
     const DELETE = 'delete';
+    const UPDATEORCREATE = 'updateorcreate';
 
     public $action;
 
@@ -17,8 +18,12 @@ class DataSyncAction {
         return $this->action == self::CREATE;
     }
 
+    public function isUpdateOrCreate() {
+        return $this->action == self::UPDATEORCREATE;
+    }
+
     public function isUpdate() {
-        return $this->action == self::UPDATE;
+        return $this->isUpdateOrCreate() || $this->action == self::UPDATE;
     }
 
     public function isDelete() {

@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Commands;
 
+use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -74,12 +75,12 @@ class ManualDataSyncCommand extends Command {
         $models
             // filter models by argument first
             // if no argument is set -> allow all models
-            ->filter(function ($model) {
+            ->filter(function ($class, $syncName) {
                 if (!$this->models) {
                     return true;
                 }
 
-                return in_array($model, $this->models->toArray());
+                return in_array($syncName, $this->models->toArray());
             })
             ->each(function ($modelClass) {
 
@@ -117,11 +118,17 @@ class ManualDataSyncCommand extends Command {
                 }
         });
 
-        app('dataSync.handler')->dispatch();
+        if (!$this->debug) {
+            app('dataSync.handler')->dispatch();
+        }
 	}
 
 	protected function triggerSync(DataSyncing $entity) {
         $this->verboseInfo('Syncing model ' . get_class($entity) . ' #' . $entity->id);
+
+        if (!$this->debug) {
+            dataSync($entity, new DataSyncAction(DataSyncAction::UPDATEORCREATE))->completeSync();
+        }
     }
 
 	protected function verboseInfo($info) {

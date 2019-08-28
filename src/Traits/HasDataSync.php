@@ -51,7 +51,7 @@ trait HasDataSync {
         return;
     }
 
-    public function getSyncedAttributeData() {
+    public function getDirtySyncedAttributeData() {
         $allFields = $this->getDirty();
 
         if (empty($allFields)) {
@@ -61,6 +61,12 @@ trait HasDataSync {
         $changedFields = array_intersect_key($allFields, array_flip($this->getSyncedFields()));
 
         return $changedFields;
+    }
+
+    public function getAllSyncedAttributeData() {
+        $allFields = $this->getAttributes();
+
+        return array_intersect_key($allFields, array_flip($this->getSyncedFields()));
     }
 
     /**
