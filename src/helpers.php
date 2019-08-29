@@ -7,6 +7,6 @@ if (!function_exists('dataSync')) {
      * @return \Baufragen\DataSync\Helpers\DataSyncCollector
      */
     function dataSync(\Baufragen\DataSync\Interfaces\DataSyncing $model, \Baufragen\DataSync\Helpers\DataSyncAction $action) {
-        return optional(app('dataSync.handler')->getCollectorForModel($model, $action));
+        return app('dataSync.handler')->getCollectorForModel($model, $action);
     }
 }

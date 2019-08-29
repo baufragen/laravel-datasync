@@ -273,4 +273,8 @@ class DataSyncCollector {
             ];
         }
     }
+
+    public function isDummy() {
+        return $this->action->isDummy();
+    }
 }

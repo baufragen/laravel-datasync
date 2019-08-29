@@ -14,7 +14,7 @@ class DataSyncHandler {
 
     public function getCollectorForModel(DataSyncing $model, DataSyncAction $action) {
         if (app()->environment('testing')) {
-            return null;
+            return $this->createDataCollectorForModel($model, new DataSyncAction(DataSyncAction::DUMMY));
         }
 
         if (!empty($this->dataCollectors[$model->getSyncName()])) {
@@ -28,7 +28,11 @@ class DataSyncHandler {
     }
 
     public function hasOpenSyncs() {
-        return $this->dataCollectors->isNotEmpty();
+        return $this->dataCollectors
+            ->map(function (DataSyncCollector $collector) {
+                return !$collector->isDummy();
+            })
+            ->isNotEmpty();
     }
 
     public function dispatch() {

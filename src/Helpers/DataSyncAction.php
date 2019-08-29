@@ -3,10 +3,11 @@
 namespace Baufragen\DataSync\Helpers;
 
 class DataSyncAction {
-    const CREATE = 'create';
-    const UPDATE = 'update';
-    const DELETE = 'delete';
-    const UPDATEORCREATE = 'updateorcreate';
+    const CREATE            = 'create';
+    const UPDATE            = 'update';
+    const DELETE            = 'delete';
+    const UPDATEORCREATE    = 'updateorcreate';
+    const DUMMY             = 'dummy';
 
     public $action;
 
@@ -28,6 +29,10 @@ class DataSyncAction {
 
     public function isDelete() {
         return $this->action == self::DELETE;
+    }
+
+    public function isDummy() {
+        return $this->action == self::DUMMY;
     }
 
     public function __toString() {
