@@ -6,6 +6,7 @@ use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Helpers\DataSyncCollector;
 use Baufragen\DataSync\Helpers\DataSyncTransformer;
+use Baufragen\DataSync\Interfaces\DataSyncing;
 
 trait HasDataSync {
 
@@ -14,20 +15,20 @@ trait HasDataSync {
 
     public static function bootHasDataSync() {
 
-        static::created(function ($model) {
-            if ($model->dataSyncEnabled) {
+        static::created(function (DataSyncing $model) {
+            if ($model->automaticDataSyncEnabled()) {
                 $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::CREATE)));
             }
         });
 
-        static::updated(function ($model) {
-            if ($model->dataSyncEnabled) {
+        static::updated(function (DataSyncing $model) {
+            if ($model->automaticDataSyncEnabled()) {
                 $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::UPDATE)));
             }
         });
 
-        static::deleted(function ($model) {
-            if ($model->dataSyncEnabled) {
+        static::deleted(function (DataSyncing $model) {
+            if ($model->automaticDataSyncEnabled()) {
                 $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::DELETE)));
             }
         });
@@ -139,6 +140,17 @@ trait HasDataSync {
 
     public function disableDataSync() {
         $this->dataSyncEnabled = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function dataSyncEnabled() {
+        return $this->dataSyncEnabled;
+    }
+
+    public function automaticDataSyncEnabled() {
+        return $this->dataSyncEnabled() && (!property_exists($this, "disableAutomaticDataSync") || $this->disableAutomaticDataSync === false);
     }
 
     /**
