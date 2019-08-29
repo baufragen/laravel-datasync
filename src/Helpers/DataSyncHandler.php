@@ -28,10 +28,7 @@ class DataSyncHandler {
     }
 
     public function hasOpenSyncs() {
-        return $this->dataCollectors
-            ->map(function (DataSyncCollector $collector) {
-                return !$collector->isDummy();
-            })
+        return $this->nonDummyCollectors()
             ->isNotEmpty();
     }
 
@@ -54,5 +51,25 @@ class DataSyncHandler {
         $this->dataCollectors[$model->getSyncName()]->push($collector);
 
         return $collector;
+    }
+
+    protected function nonDummyCollectors() {
+        return $this->dataCollectors
+            ->map(function ($collectors) {
+                return $collectors
+                    ->map(function(DataSyncCollector $collector) {
+                        if ($collector->isDummy()) {
+                            return null;
+                        }
+
+                        return $collector;
+                    })
+                    ->filter(function ($collector) {
+                        return !empty($collector);
+                    });
+            })
+            ->filter(function ($collectors) {
+                return $collectors->isNotEmpty();
+            });
     }
 }
