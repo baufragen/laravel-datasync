@@ -33,11 +33,13 @@ class DataSyncHandler {
     }
 
     public function dispatch() {
-        $this->dataCollectors->each(function ($collectors) {
-            $collectors->each(function ($collector) {
-                HandleDataSync::dispatch($collector);
+        $this->nonDummyCollectors()
+            ->each(function ($collectors) {
+                $collectors->each(function (DataSyncCollector $collector) {
+                    $collector->getModel()->beforeDataSync($collector);
+                    HandleDataSync::dispatch($collector);
+                });
             });
-        });
     }
 
     protected function createDataCollectorForModel(DataSyncing $model, DataSyncAction $action) {

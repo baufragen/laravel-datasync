@@ -17,19 +17,19 @@ trait HasDataSync {
 
         static::created(function (DataSyncing $model) {
             if ($model->automaticDataSyncEnabled()) {
-                $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::CREATE)));
+                dataSync($model, new DataSyncAction(DataSyncAction::CREATE));
             }
         });
 
         static::updated(function (DataSyncing $model) {
             if ($model->automaticDataSyncEnabled()) {
-                $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::UPDATE)));
+                dataSync($model, new DataSyncAction(DataSyncAction::UPDATE));
             }
         });
 
         static::deleted(function (DataSyncing $model) {
             if ($model->automaticDataSyncEnabled()) {
-                $model->beforeDataSync(dataSync($model, new DataSyncAction(DataSyncAction::DELETE)));
+                dataSync($model, new DataSyncAction(DataSyncAction::DELETE));
             }
         });
 
