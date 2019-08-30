@@ -3,8 +3,8 @@
 namespace Baufragen\DataSync\Interfaces;
 
 use Baufragen\DataSync\Collectors\DataSyncCollecting;
-use Baufragen\DataSync\Helpers\AttributeCollector;
-use Baufragen\DataSync\Helpers\FileCollector;
+use Baufragen\DataSync\Collectors\AttributeCollector;
+use Baufragen\DataSync\Collectors\FileCollector;
 
 interface DataSyncing {
     public function getSyncName();
