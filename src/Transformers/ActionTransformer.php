@@ -3,6 +3,7 @@
 namespace Baufragen\DataSync\Transformers;
 
 use Baufragen\DataSync\Helpers\DataSyncConnection;
+use Baufragen\DataSync\Interfaces\DataSyncing;
 use Illuminate\Http\Request;
 
 class ActionTransformer extends BaseTransformer {
@@ -49,5 +50,23 @@ class ActionTransformer extends BaseTransformer {
         return [
             'executableaction' => 'required',
         ];
+    }
+
+    protected function getModelFromRequest(Request $request) {
+        $modelClass = app('dataSync.container')->getClassBySyncName($request->get('model'));
+
+        if ($request->filled('identifier')) {
+            $model = $modelClass::find($request->get('identifier'));
+        }
+
+        if (empty($model)) {
+            $model = new $modelClass();
+        }
+
+        if (!$model instanceof DataSyncing) {
+            throw new \Exception("Class " . $modelClass . " does not implement DataSyncing interface");
+        }
+
+        return $model;
     }
 }
