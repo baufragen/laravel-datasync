@@ -12,7 +12,7 @@ class AttributeTransformer extends BaseTransformer {
     {
         parent::__construct($request, $connection);
 
-        $this->getAttributesFromRequest($request);
+        $this->attributes = $this->getAttributesFromRequest($request);
     }
 
     protected function validationRules() {
