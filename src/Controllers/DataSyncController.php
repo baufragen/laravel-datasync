@@ -2,7 +2,6 @@
 
 namespace Baufragen\DataSync\Controllers;
 
-use Baufragen\DataSync\Helpers\DataSyncTransformer;
 use Baufragen\DataSync\Rules\CorrectDataSyncApiKey;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;

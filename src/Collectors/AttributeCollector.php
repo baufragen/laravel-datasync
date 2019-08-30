@@ -35,7 +35,6 @@ abstract class AttributeCollector extends BaseCollector implements DataSyncColle
         $this->model->beforeDataSyncAttributes($this);
 
         return $this->attributes
-            ->merge(collect(['action' => (string)$this->action]))
             ->map(function ($value) {
                 if (is_bool($value)) {
                     return "bool:" . (string)$value;
@@ -55,6 +54,10 @@ abstract class AttributeCollector extends BaseCollector implements DataSyncColle
                 ];
             })
             ->values()
+            ->push([
+                'name'      => 'action',
+                'contents'  => (string)$this->action,
+            ])
             ->toArray();
     }
 
