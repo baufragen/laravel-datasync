@@ -6,16 +6,10 @@ use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use GuzzleHttp\Client;
 
 class DataSyncClient extends Client {
-    public function __construct($connection)
+    public function __construct(DataSyncConnection $connection)
     {
-        $connectionDetails = config('datasync.connections.' . $connection);
-
-        if (empty($connectionDetails)) {
-            throw new ConfigNotFoundException("Config for connection " . $connection . " could not be found");
-        }
-
         $config = [
-            'base_uri'  => $connectionDetails['baseurl'],
+            'base_uri'  => $connection->getBaseUrl(),
             'verify'    => false, // TODO: make this configurable
         ];
 

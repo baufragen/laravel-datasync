@@ -2,8 +2,12 @@
 
 namespace Baufragen\DataSync\Helpers;
 
+use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Exceptions\CollectorClassNotFoundException;
+use Baufragen\DataSync\Exceptions\TransformerClassNotFoundException;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 use Baufragen\DataSync\Jobs\HandleDataSync;
+use Illuminate\Http\Request;
 
 class DataSyncHandler {
     protected $dataCollectors;
@@ -12,66 +16,64 @@ class DataSyncHandler {
         $this->dataCollectors = collect([]);
     }
 
-    public function getCollectorForModel(DataSyncing $model, DataSyncAction $action) {
-        if (app()->environment('testing')) {
-            return $this->createDataCollectorForModel($model, new DataSyncAction(DataSyncAction::DUMMY));
+    public function getTransformerForType($type, Request $request) {
+        $transformerClass = config('datasync.transformers.' . $type);
+
+        if (!$transformerClass) {
+            throw new TransformerClassNotFoundException("No Transformer found [" . $type . "]");
         }
 
-        if (!empty($this->dataCollectors[$model->getSyncName()])) {
-            if ($collector = $this->dataCollectors[$model->getSyncName()]->filter(function ($collector) use ($model) {
-                return $collector->getModel()->is($model) ?? false;
-            })->first()) {
-                return $collector;
-            }
+        $connection = new DataSyncConnection($request->get('connection'));
+
+        return new $transformerClass($request, $connection);
+    }
+
+    public function getCollectorForModel(DataSyncing $model, string $collectorClass) {
+        if (app()->environment('testing')) {
+            return $this->createDataCollectorForModel($model, DummyCollector::class);
         }
-        return $this->createDataCollectorForModel($model, $action);
+
+        return $this->createDataCollectorForModel($model, $collectorClass);
     }
 
     public function hasOpenSyncs() {
-        return $this->nonDummyCollectors()
+        return $this
+            ->nonDummyCollectors()
             ->isNotEmpty();
     }
 
     public function dispatch() {
-        $this->nonDummyCollectors()
-            ->each(function ($collectors) {
-                $collectors->each(function (DataSyncCollector $collector) {
-                    $collector->getModel()->beforeDataSync($collector);
-                    HandleDataSync::dispatch($collector);
-                });
+        $this
+            ->nonDummyCollectors()
+            ->each(function (DataSyncCollecting $collector) {
+                if (!$collector->getModel()->beforeDataSync($collector)) {
+                    return;
+                }
+                HandleDataSync::dispatch($collector);
             });
     }
 
-    protected function createDataCollectorForModel(DataSyncing $model, DataSyncAction $action) {
-        if (!isset($this->dataCollectors[$model->getSyncName()])) {
-            $this->dataCollectors[$model->getSyncName()] = collect([]);
+    protected function createDataCollectorForModel(DataSyncing $model, string $collectorClass) {
+        if (!class_exists($collectorClass)) {
+            $configCollectorClass = config('datasync.collectors.' . $collectorClass);
+
+            if (!$configCollectorClass || !class_exists($configCollectorClass)) {
+                throw new CollectorClassNotFoundException("Collector class not found [" . $collectorClass . "]");
+            }
+
+            $collectorClass = $configCollectorClass;
         }
+        $collector = new $collectorClass($model);
 
-        $collector = new DataSyncCollector($action);
-        $collector->initForModel($model);
-
-        $this->dataCollectors[$model->getSyncName()]->push($collector);
+        $this->dataCollectors->push($collector);
 
         return $collector;
     }
 
     protected function nonDummyCollectors() {
         return $this->dataCollectors
-            ->map(function ($collectors) {
-                return $collectors
-                    ->map(function(DataSyncCollector $collector) {
-                        if ($collector->isDummy()) {
-                            return null;
-                        }
-
-                        return $collector;
-                    })
-                    ->filter(function ($collector) {
-                        return !empty($collector);
-                    });
-            })
-            ->filter(function ($collectors) {
-                return $collectors->isNotEmpty();
+            ->filter(function (DataSyncCollecting $collector) {
+                return $collector->getType() !== 'dummy';
             });
     }
 }

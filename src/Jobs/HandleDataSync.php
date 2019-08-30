@@ -2,11 +2,11 @@
 
 namespace Baufragen\DataSync\Jobs;
 
+use Baufragen\DataSync\Collectors\DataSyncCollecting;
 use Baufragen\DataSync\DataSyncLog;
-use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
 use Baufragen\DataSync\Exceptions\DataSyncRequestFailedException;
 use Baufragen\DataSync\Helpers\DataSyncClient;
-use Baufragen\DataSync\Helpers\DataSyncCollector;
+use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,37 +17,23 @@ use GuzzleHttp\Exception\RequestException;
 class HandleDataSync implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /** @var DataSyncCollector */
+    /** @var DataSyncCollecting */
     protected $dataCollector;
 
-    public function __construct(DataSyncCollector $collector) {
+    public function __construct(DataSyncCollecting $collector) {
         $this->dataCollector = $collector;
     }
 
     public function handle() {
         $this->dataCollector
             ->getConnections()
-            ->each(function($connection) {
+            ->each(function(DataSyncConnection $connection) {
                 $this->syncToConnection($connection);
             });
     }
 
-    protected function syncToConnection($connection) {
+    protected function syncToConnection(DataSyncConnection $connection) {
         $client = new DataSyncClient($connection);
-
-        $config = config('datasync.connections.' . $connection);
-
-        if (empty($config)) {
-            throw new ConfigNotFoundException("Config not found for connection " . $connection);
-        }
-
-        $encrypted  = $config['encrypted'];
-        $apiKey     = $config['apikey'];
-
-        $attributes     = $this->getAttributesFromCollector($this->dataCollector, $encrypted);
-        $files          = $this->getFilesFromCollector($this->dataCollector);
-        $relationdata   = $this->getRelatedDataFromCollector($this->dataCollector, $encrypted);
-        $customActions  = $this->getCustomActionsFromCollector($this->dataCollector, $encrypted);
 
         try {
             $payload = array_merge(
@@ -58,11 +44,11 @@ class HandleDataSync implements ShouldQueue {
                     ],
                     [
                         'name'      => 'apikey',
-                        'contents'  => $apiKey,
+                        'contents'  => $connection->getApiKey(),
                     ],
                     [
                         'name'      => 'encrypted',
-                        'contents'  => $encrypted,
+                        'contents'  => $connection->isEncrypted(),
                     ],
                     [
                         'name'      => 'model',
@@ -73,14 +59,11 @@ class HandleDataSync implements ShouldQueue {
                         'contents'  => $this->dataCollector->getIdentifier(),
                     ],
                     [
-                        'name'      => 'action',
-                        'contents'  => (string)$this->dataCollector->getAction(),
+                        'name'      => 'type',
+                        'contents'  => $this->dataCollector->getType(),
                     ],
                 ],
-                $attributes,
-                $relationdata,
-                $files,
-                $customActions
+                $this->dataCollector->transform($connection)
             );
 
             $response = $client->post(route('dataSync.handle', [], false), [
@@ -92,107 +75,16 @@ class HandleDataSync implements ShouldQueue {
 
             if (in_array($response->getStatusCode(), [200, 201])) {
                 if ($this->dataCollector->shouldLog()) {
-                    DataSyncLog::succeeded($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $response);
+                    DataSyncLog::succeeded($this->dataCollector->getType(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $response);
                 }
             }
         } catch (RequestException $e) {
             // errors always get logged
-            DataSyncLog::failed($this->dataCollector->getAction(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $e->getResponse());
+            DataSyncLog::failed($this->dataCollector->getType(), $this->dataCollector->getSyncName(), $this->dataCollector->getIdentifier(), $connection, $payload, $e->getResponse());
 
             throw new DataSyncRequestFailedException("DataSync Request failed (" . $e->getResponse()->getStatusCode() . "): " . $e->getResponse()->getReasonPhrase());
         } catch (\Exception $e) {
             throw new DataSyncRequestFailedException("DataSync Request failed with Exception: " . $e->getMessage());
         }
-    }
-
-    protected function getAttributesFromCollector(DataSyncCollector $collector, $encrypted) {
-        return collect($collector->getAttributes())
-            ->map(function ($value) {
-                if (is_bool($value)) {
-                    return "bool:" . (string)$value;
-                }
-
-                return $value;
-            })
-            ->when($encrypted, function ($attributes) {
-                return $attributes->mapWithKeys(function ($attribute, $key) {
-                    return [$key => encrypt($attribute)];
-                });
-            })
-            ->map(function ($value, $key) {
-                return [
-                    'name' => 'data[' . $key . ']',
-                    'contents' => $value,
-                ];
-            })
-            ->values()
-            ->toArray();
-    }
-
-    protected function getFilesFromCollector(DataSyncCollector $collector) {
-        return collect($collector->getFiles())
-            ->map(function ($file, $name) {
-                if (!file_exists($file['path'])) {
-                    return null;
-                }
-
-                return array_merge(
-                    [
-                        'name'      => 'files[' . $name . ']',
-                        'contents'  => fopen($file['path'], 'r'),
-                    ],
-                    !empty($file['fileName']) ? ['filename' => $file['fileName']] : [],
-                    !empty($file['mimeType']) ? ['headers' => ['Content-Type' => $file['mimeType']]] : []
-                );
-            })
-            ->filter(function ($file) {
-                return !empty($file);
-            })
-            ->toArray();
-    }
-
-    protected function getRelatedDataFromCollector(DataSyncCollector $collector, $encrypted) {
-        return collect($collector->getRelatedData())
-            ->map(function ($value, $relation) {
-                return [
-                    'name' => 'relationdata[' . $relation . ']',
-                    'contents' => json_encode($value),
-                ];
-            })
-            ->when($encrypted, function ($relations) {
-                return $relations->map(function ($relation) {
-                    $relation['contents'] = encrypt($relation['contents']);
-                    return $relation;
-                });
-            })
-            ->values()
-            ->toArray();
-    }
-
-    protected function getCustomActionsFromCollector(DataSyncCollector $collector, $encrypted) {
-        return collect($collector->getCustomActions())
-            ->map(function ($datasets) {
-                return $datasets->map(function($dataset) {
-                    return json_encode($dataset);
-                });
-            })
-            ->when($encrypted, function ($actions) {
-                return $actions->map(function ($datasets) {
-                    return $datasets->map(function($dataset) {
-                        return encrypt($dataset);
-                    });
-                });
-            })
-            ->map(function ($datasets, $action) {
-                return $datasets->map(function ($dataset, $index) use ($action) {
-                    return [
-                        'name' => 'customactions[' . $action . '][' . $index . ']',
-                        'contents' => $dataset,
-                    ];
-                });
-            })
-            ->flatten(1)
-            ->values()
-            ->toArray();
     }
 }

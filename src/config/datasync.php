@@ -23,4 +23,18 @@ return [
 
     ],
 
+    'collectors'    => [
+        'attribute-all'     => Baufragen\DataSync\Collectors\AllAttributeCollector::class,
+        'attribute-changed' => Baufragen\DataSync\Collectors\ChangedAttributeCollector::class,
+        'raw'               => Baufragen\DataSync\Collectors\RawCollector::class,
+        'file'              => Baufragen\DataSync\Collectors\FileCollector::class,
+        'dummy'             => Baufragen\DataSync\Collectors\DummyCollector::class,
+    ],
+
+    'transformers'  => [
+        'attribute' => Baufragen\DataSync\Transformers\AttributeTransformer::class,
+        'raw'       => Baufragen\DataSync\Transformers\RawTransformer::class,
+        'file'      => Baufragen\DataSync\Transformers\FileTransformer::class,
+    ]
+
 ];

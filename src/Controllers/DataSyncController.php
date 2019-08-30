@@ -2,14 +2,12 @@
 
 namespace Baufragen\DataSync\Controllers;
 
-use Baufragen\DataSync\Exceptions\ConfigNotFoundException;
-use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Helpers\DataSyncTransformer;
 use Baufragen\DataSync\Rules\CorrectDataSyncApiKey;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Validator;
 
 class DataSyncController extends BaseController {
     use ValidatesRequests;
@@ -18,20 +16,17 @@ class DataSyncController extends BaseController {
         $this->validate($request, [
             'connection'    => 'required',
             'apikey'        =>  ['required', new CorrectDataSyncApiKey($request->get('connection'))],
+            'encrypted'     => 'required|boolean',
             'model'         => 'required',
             'identifier'    => 'nullable|integer',
-            'data'          => 'nullable',
-            'action'        => 'required',
-            'relationdata'  => 'nullable',
-            'files'         => 'nullable',
-            'files.*'       => 'file',
-            'customactions' => 'nullable',
+            'type'          => ['required', 'string', Rule::in(array_keys(config('datasync.transformers')))],
         ]);
 
         try {
 
-            $transformer = new DataSyncTransformer($request);
-            $transformer->executeDataSync();
+            $transformer = app('dataSync.handler')->getTransformerForType($request->get('type'), $request);
+            $transformer->validate();
+            $transformer->sync();
 
         } catch (\Exception $e) {
             abort(500, $e->getMessage());

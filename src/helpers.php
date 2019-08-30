@@ -2,11 +2,17 @@
 
 if (!function_exists('dataSync')) {
     /**
-     * @param \Baufragen\DataSync\Interfaces\DataSyncing $model
-     * @param \Baufragen\DataSync\Helpers\DataSyncAction $action
-     * @return \Baufragen\DataSync\Helpers\DataSyncCollector
+     * @param Baufragen\DataSync\Interfaces\DataSyncing $model
+     * @param string $collectorClass
+     * @return Baufragen\DataSync\Collectors\DataSyncCollecting
      */
-    function dataSync(\Baufragen\DataSync\Interfaces\DataSyncing $model, \Baufragen\DataSync\Helpers\DataSyncAction $action) {
-        return app('dataSync.handler')->getCollectorForModel($model, $action);
+    function dataSync(\Baufragen\DataSync\Interfaces\DataSyncing $model, string $collectorClass, ...$afterCreationParameters) {
+        $collector = app('dataSync.handler')->getCollectorForModel($model, $collectorClass);
+
+        if (method_exists($collector, "afterCreation")) {
+            $collector->afterCreation($afterCreationParameters);
+        }
+
+        return $collector;
     }
 }
