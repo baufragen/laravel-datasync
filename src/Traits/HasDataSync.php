@@ -122,7 +122,7 @@ trait HasDataSync {
         return $this->dataSyncEnabled() && (!property_exists($this, "disableAutomaticDataSync") || $this->disableAutomaticDataSync === false);
     }
 
-    protected function executeAttributeDataSync(AttributeTransformer $transformer) {
+    public function executeAttributeDataSync(AttributeTransformer $transformer) {
         $this->disableDataSync();
 
         $attributes = $transformer->getAttributes();
@@ -140,11 +140,11 @@ trait HasDataSync {
         $this->enableDataSync();
     }
 
-    protected function executeFileDataSync(string $fileName, UploadedFile $file) {
+    public function executeFileDataSync(string $fileName, UploadedFile $file) {
         return;
     }
 
-    protected function executeRawDataSync(RawTransformer $transformer) {
+    public function executeRawDataSync(RawTransformer $transformer) {
         return;
     }
 

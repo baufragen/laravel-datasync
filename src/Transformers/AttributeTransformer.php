@@ -18,7 +18,7 @@ class AttributeTransformer extends BaseTransformer {
     protected function validationRules() {
         return [
             'attributes'        => 'required|array',
-            'attributes[id]'    => 'required|integer',
+            'attributes.id'    => 'required|integer',
         ];
     }
 
