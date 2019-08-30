@@ -2,7 +2,7 @@
 
 namespace Baufragen\DataSync\Transformers;
 
-use Baufragen\DataSync\Collectors\DataSyncTransforming;
+use Baufragen\DataSync\Interfaces\DataSyncTransforming;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Baufragen\DataSync\Interfaces\DataSyncing;

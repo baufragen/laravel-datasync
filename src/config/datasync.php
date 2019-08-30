@@ -28,6 +28,7 @@ return [
         'attribute-changed' => Baufragen\DataSync\Collectors\ChangedAttributeCollector::class,
         'raw'               => Baufragen\DataSync\Collectors\RawCollector::class,
         'file'              => Baufragen\DataSync\Collectors\FileCollector::class,
+        'action'            => Baufragen\DataSync\Collectors\ActionCollector::class,
         'dummy'             => Baufragen\DataSync\Collectors\DummyCollector::class,
     ],
 
@@ -35,6 +36,7 @@ return [
         'attribute' => Baufragen\DataSync\Transformers\AttributeTransformer::class,
         'raw'       => Baufragen\DataSync\Transformers\RawTransformer::class,
         'file'      => Baufragen\DataSync\Transformers\FileTransformer::class,
+        'action'    => Baufragen\DataSync\Transformers\ActionTransformer::class,
     ]
 
 ];

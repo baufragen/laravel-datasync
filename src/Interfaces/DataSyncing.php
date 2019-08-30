@@ -2,7 +2,7 @@
 
 namespace Baufragen\DataSync\Interfaces;
 
-use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\AttributeCollector;
 use Baufragen\DataSync\Collectors\FileCollector;
 use Baufragen\DataSync\Transformers\AttributeTransformer;
@@ -20,4 +20,5 @@ interface DataSyncing {
     public function executeAttributeDataSync(AttributeTransformer $transformer);
     public function executeFileDataSync(string $fileName, UploadedFile $file);
     public function executeRawDataSync(RawTransformer $transformer);
+    public function executeActionDataSync(string $action, $additionalData = null);
 }

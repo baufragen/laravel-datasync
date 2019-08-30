@@ -5,7 +5,7 @@ namespace Baufragen\DataSync\Traits;
 use Baufragen\DataSync\Collectors\AllAttributeCollector;
 use Baufragen\DataSync\Collectors\AttributeCollector;
 use Baufragen\DataSync\Collectors\ChangedAttributeCollector;
-use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\FileCollector;
 use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Helpers\DataSyncAction;
@@ -145,6 +145,10 @@ trait HasDataSync {
     }
 
     public function executeRawDataSync(RawTransformer $transformer) {
+        return;
+    }
+
+    public function executeActionDataSync(string $action, $additionalData = null) {
         return;
     }
 

@@ -2,7 +2,7 @@
 
 namespace Baufragen\DataSync\Collectors;
 
-use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;

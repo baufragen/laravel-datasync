@@ -4,7 +4,7 @@ if (!function_exists('dataSync')) {
     /**
      * @param Baufragen\DataSync\Interfaces\DataSyncing $model
      * @param string $collectorClass
-     * @return Baufragen\DataSync\Collectors\DataSyncCollecting
+     * @return Baufragen\DataSync\Interfaces\DataSyncCollecting
      */
     function dataSync(\Baufragen\DataSync\Interfaces\DataSyncing $model, string $collectorClass, ...$afterCreationParameters) {
         $collector = app('dataSync.handler')->getCollectorForModel($model, $collectorClass);

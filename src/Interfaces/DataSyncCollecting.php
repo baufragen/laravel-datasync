@@ -1,6 +1,6 @@
 <?php
 
-namespace Baufragen\DataSync\Collectors;
+namespace Baufragen\DataSync\Interfaces;
 
 use Baufragen\DataSync\Helpers\DataSyncConnection;
 

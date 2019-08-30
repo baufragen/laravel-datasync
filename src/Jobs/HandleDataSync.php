@@ -2,7 +2,7 @@
 
 namespace Baufragen\DataSync\Jobs;
 
-use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Exceptions\DataSyncRequestFailedException;
 use Baufragen\DataSync\Helpers\DataSyncClient;

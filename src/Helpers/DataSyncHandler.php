@@ -2,7 +2,7 @@
 
 namespace Baufragen\DataSync\Helpers;
 
-use Baufragen\DataSync\Collectors\DataSyncCollecting;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\DummyCollector;
 use Baufragen\DataSync\Exceptions\CollectorClassNotFoundException;
 use Baufragen\DataSync\Exceptions\TransformerClassNotFoundException;

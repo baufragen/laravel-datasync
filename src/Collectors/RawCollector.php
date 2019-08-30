@@ -3,6 +3,7 @@
 namespace Baufragen\DataSync\Collectors;
 
 use Baufragen\DataSync\Helpers\DataSyncConnection;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 
 class RawCollector extends BaseCollector implements DataSyncCollecting {
