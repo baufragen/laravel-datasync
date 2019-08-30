@@ -16,7 +16,7 @@ class DataSyncController extends BaseController {
         $this->validate($request, [
             'connection'    => 'required',
             'apikey'        =>  ['required', new CorrectDataSyncApiKey($request->get('connection'))],
-            'encrypted'     => 'required|boolean',
+            'encrypted'     => 'required',
             'model'         => 'required',
             'identifier'    => 'nullable|integer',
             'type'          => ['required', 'string', Rule::in(array_keys(config('datasync.transformers')))],
