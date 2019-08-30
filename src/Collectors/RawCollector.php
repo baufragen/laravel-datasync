@@ -27,8 +27,10 @@ class RawCollector extends BaseCollector implements DataSyncCollecting {
         $rawData = json_encode($this->rawData);
 
         return [
+            [
             'name' => 'rawdata',
             'contents' => $connection->isEncrypted() ? encrypt($rawData) : $rawData,
+            ],
         ];
     }
 
