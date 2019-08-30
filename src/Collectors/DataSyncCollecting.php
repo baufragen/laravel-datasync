@@ -11,4 +11,5 @@ interface DataSyncCollecting {
     public function transform(DataSyncConnection $connection);
     public function getType();
     public function getModel();
+    public function shouldLog();
 }

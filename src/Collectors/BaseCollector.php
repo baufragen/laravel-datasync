@@ -72,4 +72,8 @@ abstract class BaseCollector {
     public function getModel() {
         return $this->model;
     }
+
+    public function shouldLog() {
+        return true;
+    }
 }
