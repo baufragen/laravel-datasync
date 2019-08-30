@@ -12,7 +12,6 @@ interface DataSyncing {
     public function beforeDataSync(DataSyncCollecting $collector);
     public function beforeDataSyncAttributes(AttributeCollector $collector);
     public function beforeDataSyncFiles(FileCollector $collector);
-    public function getRawSyncData();
     public function getDirtySyncedAttributeData();
     public function getAllSyncedAttributeData();
 }

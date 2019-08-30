@@ -31,6 +31,10 @@ class RawTransformer extends BaseTransformer {
         }
     }
 
+    public function getRawData() {
+        return $this->rawData;
+    }
+
     protected function getRawDataFromRequest(Request $request) {
         $decoded = json_decode($request->get('rawData'), true);
 

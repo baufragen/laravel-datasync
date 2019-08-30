@@ -6,6 +6,8 @@ use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 
 class RawCollector extends BaseCollector implements DataSyncCollecting {
+    protected $rawData = [];
+
     public function __construct(DataSyncing $model) {
         parent::__construct();
 
@@ -13,14 +15,16 @@ class RawCollector extends BaseCollector implements DataSyncCollecting {
         $this->identifier($model->id);
     }
 
-    public function transform(DataSyncConnection $connection) {
-        $rawData = $this->model->getRawSyncData();
+    public function add($key, $value) {
+        $this->rawData[$key] = $value;
+    }
 
-        if (!$rawData) {
+    public function transform(DataSyncConnection $connection) {
+        if (empty($this->rawData)) {
             return null;
         }
 
-        $rawData = json_encode($rawData);
+        $rawData = json_encode($this->rawData);
 
         return [
             'name' => 'rawdata',
