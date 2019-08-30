@@ -3,6 +3,7 @@
 namespace Baufragen\DataSync\Collectors;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Helpers\DataSyncConnection;
+use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 
 abstract class AttributeCollector extends BaseCollector implements DataSyncCollecting {
