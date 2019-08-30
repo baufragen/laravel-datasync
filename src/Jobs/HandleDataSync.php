@@ -48,7 +48,7 @@ class HandleDataSync implements ShouldQueue {
                     ],
                     [
                         'name'      => 'encrypted',
-                        'contents'  => $connection->isEncrypted(),
+                        'contents'  => $connection->isEncrypted() ? 'true' : 'false',
                     ],
                     [
                         'name'      => 'model',
