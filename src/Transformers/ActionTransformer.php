@@ -69,4 +69,8 @@ class ActionTransformer extends BaseTransformer {
 
         return $model;
     }
+
+    public function getType() {
+        return 'action';
+    }
 }

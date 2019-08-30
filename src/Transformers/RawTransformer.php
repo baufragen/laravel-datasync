@@ -46,4 +46,8 @@ class RawTransformer extends BaseTransformer {
             'rawdata' => 'required',
         ];
     }
+
+    public function getType() {
+        return 'raw';
+    }
 }

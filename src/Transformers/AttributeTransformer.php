@@ -42,6 +42,22 @@ class AttributeTransformer extends BaseTransformer {
         return $this->attributes;
     }
 
+    public function hasAttribute($key) {
+        return isset($this->attributes[$key]);
+    }
+
+    public function pullAttribute($key) {
+        $value = $this->attributes[$key];
+
+        unset($this->attributes[$key]);
+
+        return $value;
+    }
+
+    public function setAttribute($key, $value) {
+        $this->attributes[$key] = $value;
+    }
+
     protected function getAttributesFromRequest(Request $request) {
         return collect($request->get('attributes', []))
             ->when($this->connection->isEncrypted(), function ($attributes) {
@@ -56,5 +72,9 @@ class AttributeTransformer extends BaseTransformer {
 
                 return $value;
             });
+    }
+
+    public function getType() {
+        return 'attribute';
     }
 }

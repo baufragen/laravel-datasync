@@ -50,4 +50,8 @@ class FileTransformer extends BaseTransformer {
                 return [$key => $file];
             });
     }
+
+    public function getType() {
+        return 'file';
+    }
 }
