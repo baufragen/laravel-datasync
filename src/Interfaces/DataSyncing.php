@@ -5,6 +5,9 @@ namespace Baufragen\DataSync\Interfaces;
 use Baufragen\DataSync\Collectors\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\AttributeCollector;
 use Baufragen\DataSync\Collectors\FileCollector;
+use Baufragen\DataSync\Transformers\AttributeTransformer;
+use Baufragen\DataSync\Transformers\RawTransformer;
+use Illuminate\Http\UploadedFile;
 
 interface DataSyncing {
     public function getSyncName();
@@ -14,7 +17,7 @@ interface DataSyncing {
     public function beforeDataSyncFiles(FileCollector $collector);
     public function getDirtySyncedAttributeData();
     public function getAllSyncedAttributeData();
-    public function executeAttributeDataSync();
-    public function executeFileDataSync();
-    public function executeRawDataSync();
+    public function executeAttributeDataSync(AttributeTransformer $transformer);
+    public function executeFileDataSync(string $fileName, UploadedFile $file);
+    public function executeRawDataSync(RawTransformer $transformer);
 }
