@@ -36,7 +36,7 @@ class RawTransformer extends BaseTransformer {
     }
 
     protected function getRawDataFromRequest(Request $request) {
-        $decoded = json_decode($request->get('rawData'), true);
+        $decoded = json_decode($request->get('rawdata'), true);
 
         return $this->connection->isEncrypted() ? decrypt($decoded) : $decoded;
     }
