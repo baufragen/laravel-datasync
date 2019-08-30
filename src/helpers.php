@@ -10,7 +10,7 @@ if (!function_exists('dataSync')) {
         $collector = app('dataSync.handler')->getCollectorForModel($model, $collectorClass);
 
         if (method_exists($collector, "afterCreation")) {
-            $collector->afterCreation($afterCreationParameters);
+            $collector->afterCreation(...$afterCreationParameters);
         }
 
         return $collector;
