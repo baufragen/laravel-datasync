@@ -166,7 +166,11 @@ trait HasDataSync {
 
     public function executeRelationSyncAttach(string $relation, $id, array $pivotData) {
         if (method_exists($this, $relation)) {
-            $this->{$relation}()->attach($id, $pivotData);
+            if ($this->{$relation}()->where('id', $id)->exists()) {
+                $this->executeRelationSyncUpdate($relation, $id, $pivotData);
+            } else {
+                $this->{$relation}()->attach($id, $pivotData);
+            }
         }
     }
 
@@ -178,7 +182,11 @@ trait HasDataSync {
 
     public function executeRelationSyncUpdate(string $relation, $id, array $pivotData) {
         if (method_exists($this, $relation)) {
-            $this->{$relation}()->updateExistingPivot($id, $pivotData);
+            if (!$this->{$relation}()->where('id', $id)->exists()) {
+                $this->executeRelationSyncAttach($relation, $id, $pivotData);
+            } else {
+                $this->{$relation}()->updateExistingPivot($id, $pivotData);
+            }
         }
     }
 
