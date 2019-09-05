@@ -51,19 +51,19 @@ class RelationTransformer extends BaseTransformer {
     }
 
     protected function getRelationFromRequest(Request $request) {
-        return $request->get('relation.name');
+        return $request->input('relation.name');
     }
 
     protected function getIdFromRequest(Request $request) {
-        return $request->get('relation.id');
+        return $request->input('relation.id');
     }
 
     protected function getTypeFromRequest(Request $request) {
-        return $request->get('relation.type');
+        return $request->input('relation.type');
     }
 
     protected function getPivotDataFromRequest(Request $request) {
-        $pivot = $request->get('relation.pivot');
+        $pivot = $request->input('relation.pivot');
         if (!empty($pivot)) {
             if ($this->connection->isEncrypted()) {
                 $pivot = decrypt($pivot);
@@ -79,7 +79,7 @@ class RelationTransformer extends BaseTransformer {
         return [
             'relation.name' => 'required',
             'relation.type' => 'required',
-            'relation.id' => 'required',
+            'relation.id'   => 'required',
         ];
     }
 

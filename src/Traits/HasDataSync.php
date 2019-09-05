@@ -165,19 +165,19 @@ trait HasDataSync {
     }
 
     public function executeRelationSyncAttach(string $relation, $id, array $pivotData) {
-        if ($this->getRelation($relation)) {
+        if (method_exists($this, $relation)) {
             $this->{$relation}()->attach($id, $pivotData);
         }
     }
 
     public function executeRelationSyncDetach(string $relation, $id, array $pivotData) {
-        if ($this->getRelation($relation)) {
+        if (method_exists($this, $relation)) {
             $this->{$relation}()->detach($id, $pivotData);
         }
     }
 
     public function executeRelationSyncUpdate(string $relation, $id, array $pivotData) {
-        if ($this->getRelation($relation)) {
+        if (method_exists($this, $relation)) {
             $this->{$relation}()->updateExistingPivot($id, $pivotData);
         }
     }
