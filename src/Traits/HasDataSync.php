@@ -164,4 +164,22 @@ trait HasDataSync {
         return null;
     }
 
+    public function executeRelationSyncAttach(string $relation, $id, array $pivotData) {
+        if ($this->getRelation($relation)) {
+            $this->{$relation}()->attach($id, $pivotData);
+        }
+    }
+
+    public function executeRelationSyncDetach(string $relation, $id, array $pivotData) {
+        if ($this->getRelation($relation)) {
+            $this->{$relation}()->detach($id, $pivotData);
+        }
+    }
+
+    public function executeRelationSyncUpdate(string $relation, $id, array $pivotData) {
+        if ($this->getRelation($relation)) {
+            $this->{$relation}()->updateExistingPivot($id, $pivotData);
+        }
+    }
+
 }

@@ -29,6 +29,7 @@ return [
         'raw'               => Baufragen\DataSync\Collectors\RawCollector::class,
         'file'              => Baufragen\DataSync\Collectors\FileCollector::class,
         'action'            => Baufragen\DataSync\Collectors\ActionCollector::class,
+        'relation'          => Baufragen\DataSync\Collectors\RelationCollector::class,
         'dummy'             => Baufragen\DataSync\Collectors\DummyCollector::class,
     ],
 
@@ -37,6 +38,7 @@ return [
         'raw'       => Baufragen\DataSync\Transformers\RawTransformer::class,
         'file'      => Baufragen\DataSync\Transformers\FileTransformer::class,
         'action'    => Baufragen\DataSync\Transformers\ActionTransformer::class,
+        'relation'  => Baufragen\DataSync\Transformers\RelationTransformer::class,
     ]
 
 ];
