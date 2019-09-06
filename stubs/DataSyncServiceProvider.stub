@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
-use Laravel\Horizon\DataSyncApplicationServiceProvider;
+use Baufragen\DataSync\DataSyncApplicationServiceProvider;
 
 class DataSyncServiceProvider extends DataSyncApplicationServiceProvider
 {
