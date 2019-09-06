@@ -9,11 +9,13 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 class FileCollector extends BaseCollector implements DataSyncCollecting {
     protected $files;
+    protected $deletedFiles;
 
     public function __construct(DataSyncing $model) {
         parent::__construct();
 
-        $this->files   = collect([]);
+        $this->files        = collect([]);
+        $this->deletedFiles = collect([]);
 
         $this->setModel($model);
         $this->identifier($model->id);
@@ -41,28 +43,51 @@ class FileCollector extends BaseCollector implements DataSyncCollecting {
         return $this;
     }
 
+    public function deleteFile($name) {
+        $this->deletedFiles->push($name);
+    }
+
     public function transform(DataSyncConnection $connection) {
         $this->model->beforeDataSyncFiles($this);
 
-        return $this->files
-            ->map(function ($file, $name) {
-                if (!file_exists($file['path'])) {
-                    return null;
-                }
+        $result = [];
 
-                return array_merge(
-                    [
-                        'name'      => 'files[' . $name . ']',
-                        'contents'  => fopen($file['path'], 'r'),
-                    ],
-                    !empty($file['fileName']) ? ['filename' => $file['fileName']] : [],
-                    !empty($file['mimeType']) ? ['headers' => ['Content-Type' => $file['mimeType']]] : []
-                );
-            })
-            ->filter(function ($file) {
-                return !empty($file);
-            })
-            ->toArray();
+        if ($this->files->isNotEmpty()) {
+            $result = array_merge($result, $this->files
+                ->map(function ($file, $name) {
+                    if (!file_exists($file['path'])) {
+                        return null;
+                    }
+
+                    return array_merge(
+                        [
+                            'name'      => 'files[' . $name . ']',
+                            'contents'  => fopen($file['path'], 'r'),
+                        ],
+                        !empty($file['fileName']) ? ['filename' => $file['fileName']] : [],
+                        !empty($file['mimeType']) ? ['headers' => ['Content-Type' => $file['mimeType']]] : []
+                    );
+                })
+                ->filter(function ($file) {
+                    return !empty($file);
+                })
+                ->toArray());
+        }
+
+        if ($this->deletedFiles->isNotEmpty()) {
+            $result = array_merge($result, $this->deletedFiles
+                ->map(function ($name) {
+                    return [
+                        [
+                            'name'      => 'deletedfile[]',
+                            'contents'  => $name,
+                        ],
+                    ];
+                })
+                ->toArray());
+        }
+
+        return $result;
     }
 
     public function getType() {

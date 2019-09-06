@@ -19,6 +19,7 @@ interface DataSyncing {
     public function getAllSyncedAttributeData();
     public function executeAttributeDataSync(AttributeTransformer $transformer);
     public function executeFileDataSync(string $fileName, UploadedFile $file);
+    public function executeFileDataSyncDeletion(string $fileName);
     public function executeRawDataSync(RawTransformer $transformer);
     public function executeActionDataSync(string $action, $additionalData = null);
     public function executeRelationSyncAttach(string $relation, $id, array $pivotData);

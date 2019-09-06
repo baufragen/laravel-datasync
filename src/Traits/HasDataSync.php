@@ -144,6 +144,10 @@ trait HasDataSync {
         return;
     }
 
+    public function executeFileDataSyncDeletion(string $fileName) {
+        return;
+    }
+
     public function executeRawDataSync(RawTransformer $transformer) {
         return;
     }

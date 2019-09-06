@@ -7,18 +7,21 @@ use Illuminate\Http\Request;
 
 class FileTransformer extends BaseTransformer {
     protected $files;
+    protected $deletedFiles;
 
     public function __construct(Request $request, DataSyncConnection $connection)
     {
         parent::__construct($request, $connection);
 
-        $this->files = $this->getFilesFromRequest($request);
+        $this->files        = $this->getFilesFromRequest($request);
+        $this->deletedFiles = $this->getDeletedFilesFromRequest($request);
     }
 
     protected function validationRules() {
         return [
-            'files'     => 'required|array',
-            'files.*'   => 'file',
+            'files'         => 'required_without:deletedfiles|array',
+            'files.*'       => 'file',
+            'deletedfiles'  => 'required_without:files',
         ];
     }
 
@@ -31,6 +34,10 @@ class FileTransformer extends BaseTransformer {
 
         $this->files->each(function ($file, $name) {
             $this->model->executeFileDataSync($name, $file);
+        });
+
+        $this->deletedFiles->each(function ($name) {
+            $this->model->executeFileDataSyncDeletion($name);
         });
 
         if (method_exists($this->model, "afterDataSyncExecution")) {
@@ -49,6 +56,10 @@ class FileTransformer extends BaseTransformer {
             ->mapWithKeys(function ($file, $key) {
                 return [$key => $file];
             });
+    }
+
+    protected function getDeletedFilesFromRequest(Request $request) {
+        return collect($request->input('deletedfiles'));
     }
 
     public function getType() {
