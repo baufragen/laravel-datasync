@@ -85,7 +85,7 @@ class FileCollector extends BaseCollector implements DataSyncCollecting {
                 $this->deletedFiles
                     ->map(function ($name) {
                         return [
-                            'name'      => 'deletedfile[]',
+                            'name'      => 'deletedfiles[]',
                             'contents'  => $name,
                         ];
                     })
