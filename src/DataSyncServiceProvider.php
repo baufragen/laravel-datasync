@@ -12,11 +12,16 @@ class DataSyncServiceProvider extends ServiceProvider {
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/config/datasync.php' => config_path('datasync.php'),
+            __DIR__ . '/../config/datasync.php' => config_path('datasync.php'),
         ], 'datasync');
 
-        $this->loadRoutesFrom(__DIR__ . '/routes/routes.php');
-        $this->loadMigrationsFrom(__DIR__ . '/migrations');
+        $this->publishes([
+            __DIR__ . '/../public' => public_path('vendor/datasync'),
+        ], 'datasync-assets');
+
+        $this->loadRoutesFrom(__DIR__ . '/../routes/routes.php');
+        $this->loadMigrationsFrom(__DIR__ . '/../migrations');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'dataSync');
 
         if ($this->app->runningInConsole()) {
             $this->commands([
