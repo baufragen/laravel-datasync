@@ -5,7 +5,9 @@
         <link rel="stylesheet" href="{{ asset('/vendor/datasync/app.css') }}">
     </head>
     <body>
-        @yield('content')
+        <div class="container">
+            @yield('content')
+        </div>
 
         <script src="{{ asset('/vendor/datasync/app.js') }}"></script>
     </body>
