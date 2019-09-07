@@ -17,6 +17,14 @@ class DataSyncLog extends Model
         $query->where('successful', false);
     }
 
+    public function isSuccessful() {
+        return $this->successful;
+    }
+
+    public function isFailed() {
+        return !$this->successful;
+    }
+
     public static function succeeded($type, $model, $identifier, DataSyncConnection $connection, $payload, $response) {
         return self::create([
             'successful'    => true,
