@@ -39,7 +39,7 @@
                         <a class="btn btn-outline-info" href="">Details</a>
                     </td>
                 </tr>
-                @else
+                @empty
                     <tr>
                         <td colspan="4">Keine aktuellen Logs vorhanden</td>
                     </tr>
