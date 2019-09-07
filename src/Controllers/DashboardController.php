@@ -14,7 +14,7 @@ class DashboardController extends Controller {
     }
 
     public function view(Request $request) {
-        $dataSyncLogs = DataSyncLog::orderBy('created_at', 'DESC')
+        $logs = DataSyncLog::orderBy('created_at', 'DESC')
             ->when($request->filled('filter'), function ($query) use ($request) {
                 switch ($request->get('filter')) {
                     case 'successful':
@@ -28,7 +28,7 @@ class DashboardController extends Controller {
             })
             ->paginate(50);
 
-        return view('dataSync::dashboard', compact("dataSyncLogs"));
+        return view('dataSync::dashboard', compact("logs"));
     }
 
 }
