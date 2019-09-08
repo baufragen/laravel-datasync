@@ -7,7 +7,7 @@ Route::prefix('datasync')->group(function() {
     Route::prefix('dashboard')->group(function () {
 
         Route::get('/', [\Baufragen\DataSync\Controllers\DashboardController::class, 'view'])->name('dataSync.dashboard.view');
-        Route::get('/{dataSyncLog}', [\Baufragen\DataSync\Controllers\DashboardController::class, 'details'])->name('dataSync.dashboard.details');
+        Route::get('/{log}', [\Baufragen\DataSync\Controllers\DashboardController::class, 'details'])->name('dataSync.dashboard.details');
 
     });
 
