@@ -922,10 +922,13 @@ module.exports = jsonTree;
 /*!*****************************!*\
   !*** ./resources/js/app.js ***!
   \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-__webpack_require__(/*! json-tree-viewer */ "./node_modules/json-tree-viewer/libs/jsonTree/jsonTree.js");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var json_tree_viewer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! json-tree-viewer */ "./node_modules/json-tree-viewer/libs/jsonTree/jsonTree.js");
+/* harmony import */ var json_tree_viewer__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(json_tree_viewer__WEBPACK_IMPORTED_MODULE_0__);
 
 var wrapper = document.getElementById("jsonData");
 
@@ -933,7 +936,7 @@ if (wrapper) {
   var jsonData = wrapper.getAttribute('data-json-data');
 
   if (jsonData) {
-    jsonTree.create(JSON.parse(jsonData), wrapper);
+    json_tree_viewer__WEBPACK_IMPORTED_MODULE_0___default.a.create(JSON.parse(jsonData), wrapper);
   }
 }
 

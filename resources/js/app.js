@@ -1,4 +1,4 @@
-require('json-tree-viewer');
+import jsonTree from 'json-tree-viewer'
 
 var wrapper = document.getElementById("jsonData");
 
