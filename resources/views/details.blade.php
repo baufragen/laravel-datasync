@@ -6,11 +6,6 @@
         <p class="lead">{{ $log->created_at->format('d.m.Y H:i') }} <small>on</small> {{ $log->connection }}</p>
     </div>
 
-    <div id="jsonData">
+    <div id="jsonData" data-json-data="{!! $log->payload !!}">
     </div>
-
-    <script>
-        var wrapper = document.getElementById("jsonData");
-        jsonTree.create({{ $log->payload }}, wrapper)
-    </script>
 @endsection

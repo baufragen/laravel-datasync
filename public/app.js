@@ -927,6 +927,16 @@ module.exports = jsonTree;
 
 __webpack_require__(/*! json-tree-viewer */ "./node_modules/json-tree-viewer/libs/jsonTree/jsonTree.js");
 
+var wrapper = document.getElementById("jsonData");
+
+if (wrapper) {
+  var jsonData = wrapper.getAttribute('data-json-data');
+
+  if (jsonData) {
+    jsonTree.create(JSON.parse(jsonData), wrapper);
+  }
+}
+
 /***/ }),
 
 /***/ "./resources/sass/app.scss":
