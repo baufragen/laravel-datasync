@@ -9,7 +9,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Datum</th>
+                <th class="text-center">Datum</th>
                 <th>Model</th>
                 <th>Connection</th>
                 <th></th>
@@ -30,13 +30,13 @@
                         {!! $log->created_at->format('d.m.Y<br/>H:i') !!}
                     </td>
                     <td>
-                        {{ $log->getModelIdentifier() }}
+                        {{ $log->getModelIdentifier() }}<br />
                         <small>{{ $log->getModelClass() }}</small>
                     </td>
                     <td>
                         {{ $log->connection }}
                     </td>
-                    <td>
+                    <td class="text-right">
                         <a class="btn btn-outline-info" href="">Details</a>
                     </td>
                 </tr>
@@ -49,7 +49,7 @@
         <tfoot>
             <tr>
                 <th>#</th>
-                <th>Datum</th>
+                <th class="text-center">Datum</th>
                 <th>Model</th>
                 <th>Connection</th>
                 <th></th>
