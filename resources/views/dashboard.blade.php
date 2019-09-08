@@ -20,12 +20,12 @@
                     <td>
                         @if ($log->isSuccessful())
                             <span class="badge badge-pill badge-success">
-                                    x
-                                </span>
+                                <i class="fa fa-check-square"></i>
+                            </span>
                         @else
                             <span class="badge badge-pill badge-danger">
-                                    x
-                                </span>
+                                <i class="fa fa-cross"></i>
+                            </span>
                         @endif
                         {{ $log->id }}
                     </td>
