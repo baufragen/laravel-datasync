@@ -32,7 +32,6 @@ class DashboardController extends Controller {
     }
 
     public function details(DataSyncLog $log) {
-
         return view('dataSync::details', compact("log"));
     }
 
