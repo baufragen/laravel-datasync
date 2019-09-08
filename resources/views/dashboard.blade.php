@@ -9,8 +9,9 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Connection</th>
+                <th>Datum</th>
                 <th>Model</th>
+                <th>Connection</th>
                 <th></th>
             </tr>
         </thead>
@@ -25,11 +26,15 @@
                         @endif
                         {{ $log->id }}
                     </td>
-                    <td>
-                        {{ $log->connection }}
+                    <td class="text-center">
+                        {!! $log->created_at->format('d.m.Y<br/>H:i') !!}
                     </td>
                     <td>
-                        {{ $log->model }} [{{ $log->identifier }}]
+                        {{ $log->getModelIdentifier() }}
+                        <small>{{ $log->getModelClass() }}</small>
+                    </td>
+                    <td>
+                        {{ $log->connection }}
                     </td>
                     <td>
                         <a class="btn btn-outline-info" href="">Details</a>
@@ -44,8 +49,9 @@
         <tfoot>
             <tr>
                 <th>#</th>
-                <th>Connection</th>
+                <th>Datum</th>
                 <th>Model</th>
+                <th>Connection</th>
                 <th></th>
             </tr>
         </tfoot>

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class DataSyncLog extends Model
 {
     protected $guarded = [];
+    protected $modelNames = [];
 
     public function scopeSuccessful($query) {
         $query->where('successful', true);
@@ -23,6 +24,43 @@ class DataSyncLog extends Model
 
     public function isFailed() {
         return !$this->successful;
+    }
+
+    public function getModelClass() {
+        if (!empty($this->modelNames[$this->model])) {
+            return $this->modelNames[$this->model];
+        }
+
+        $models = config('datasync.models');
+
+        foreach ($models as $class => $name) {
+            if ($name == $this->model) {
+                $this->modelNames[$name] = $class;
+                return $class;
+            }
+        }
+
+        return "undefined";
+    }
+
+    public function getModelIdentifier() {
+        $class = $this->getModelClass();
+
+        if (!class_exists($class)) {
+            return $this->identifier;
+        }
+
+        $model = $class::find($this->identifier);
+
+        if (!$model) {
+            return $this->identifier;
+        }
+
+        if (method_exists($model, "getDataSyncIdentifier")) {
+            return $model->getDataSyncIdentifier();
+        }
+
+        return $this->identifier;
     }
 
     public static function succeeded($type, $model, $identifier, DataSyncConnection $connection, $payload, $response) {
