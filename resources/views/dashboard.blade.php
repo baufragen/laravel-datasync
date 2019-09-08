@@ -27,7 +27,8 @@
                         {{ $log->id }}
                     </td>
                     <td class="text-center">
-                        {!! $log->created_at->format('d.m.Y<br/>H:i') !!}
+                        {{ $log->created_at->format('d.m.Y') }}<br />
+                        {{ $log->created_at->format('H:i') }}
                     </td>
                     <td>
                         {{ $log->getModelIdentifier() }}<br />
