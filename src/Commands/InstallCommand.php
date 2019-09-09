@@ -63,7 +63,7 @@ class InstallCommand extends Command {
         ));
     }
 
-    protected function replaceImagePathsInAsserts() {
+    protected function replaceImagePathsInAssets() {
 	    $cssPath = public_path("vendor/datasync/css/app.css");
 	    if (file_exists($cssPath)) {
 	        file_put_contents($cssPath, str_replace(
