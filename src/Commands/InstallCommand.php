@@ -36,6 +36,7 @@ class InstallCommand extends Command {
 
         $this->comment('Publishing DataSync Assets...');
         $this->callSilent('vendor:publish', ['--tag' => 'datasync-assets']);
+        $this->replaceImagePathsInAssets();
 
         $this->comment('Publishing DataSync Configuration...');
         $this->callSilent('vendor:publish', ['--tag' => 'datasync-config']);
@@ -60,6 +61,17 @@ class InstallCommand extends Command {
             "namespace {$namespace}\Providers;",
             file_get_contents(app_path('Providers/DataSyncServiceProvider.php'))
         ));
+    }
+
+    protected function replaceImagePathsInAsserts() {
+	    $cssPath = public_path("vendor/datasync/css/app.css");
+	    if (file_exists($cssPath)) {
+	        file_put_contents($cssPath, str_replace(
+	            "/images/vendor/json-tree-viewer/libs/jsonTree/icons.svg",
+                "/vendor/datasync/img/icons.svg",
+                file_get_contents($cssPath)
+            ));
+        }
     }
 
 }
