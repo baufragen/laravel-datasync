@@ -6,6 +6,16 @@ if (wrapper) {
     var jsonData = wrapper.getAttribute('data-json-data');
 
     if (jsonData) {
-        jsonTree.create(JSON.parse(jsonData), wrapper);
+        var tree = jsonTree.create(JSON.parse(jsonData), wrapper);
+
+        tree.expand((node) => {
+            return ![
+                'connection',
+                'apikey',
+                'encrypted',
+                'model',
+                'identifier',
+            ].includes(node.name);
+        });
     }
 }

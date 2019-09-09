@@ -936,7 +936,10 @@ if (wrapper) {
   var jsonData = wrapper.getAttribute('data-json-data');
 
   if (jsonData) {
-    json_tree_viewer__WEBPACK_IMPORTED_MODULE_0___default.a.create(JSON.parse(jsonData), wrapper);
+    var tree = json_tree_viewer__WEBPACK_IMPORTED_MODULE_0___default.a.create(JSON.parse(jsonData), wrapper);
+    tree.expand(function (node) {
+      return !['connection', 'apikey', 'encrypted', 'model', 'identifier'].includes(node.name);
+    });
   }
 }
 
