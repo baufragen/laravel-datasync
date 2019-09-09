@@ -938,7 +938,19 @@ if (wrapper) {
   if (jsonData) {
     var tree = json_tree_viewer__WEBPACK_IMPORTED_MODULE_0___default.a.create(JSON.parse(jsonData), wrapper);
     tree.expand(function (node) {
-      return !['connection', 'apikey', 'encrypted', 'model', 'identifier'].includes(node.name);
+      var expand = true;
+      node.childNodes.forEach(function (childNode) {
+        if (childNode.label === 'name') {
+          var nodeValue = childNode.el.lastChild.lastChild.innerText;
+
+          if (nodeValue) {
+            if (['connection', 'apikey', 'encrypted', 'model', 'identifier'].includes(nodeValue.replace(/"/g, ''))) {
+              expand = false;
+            }
+          }
+        }
+      });
+      return expand;
     });
   }
 }

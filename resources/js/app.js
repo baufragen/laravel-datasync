@@ -9,13 +9,19 @@ if (wrapper) {
         var tree = jsonTree.create(JSON.parse(jsonData), wrapper);
 
         tree.expand((node) => {
-            return ![
-                'connection',
-                'apikey',
-                'encrypted',
-                'model',
-                'identifier',
-            ].includes(node.name);
+            var expand = true;
+            node.childNodes.forEach((childNode) => {
+                if (childNode.label === 'name') {
+                    var nodeValue = childNode.el.lastChild.lastChild.innerText;
+
+                    if (nodeValue) {
+                        if (['connection', 'apikey', 'encrypted', 'model', 'identifier'].includes(nodeValue.replace(/"/g, ''))) {
+                            expand = false;
+                        }
+                    }
+                }
+            });
+            return expand;
         });
     }
 }
