@@ -64,14 +64,17 @@ class InstallCommand extends Command {
     }
 
     protected function replaceImagePathsInAssets() {
-	    $cssPath = public_path("vendor/datasync/css/app.css");
-	    if (file_exists($cssPath)) {
-	        file_put_contents($cssPath, str_replace(
-	            "/images/vendor/json-tree-viewer/libs/jsonTree/icons.svg",
-                "/vendor/datasync/img/icons.svg",
-                file_get_contents($cssPath)
-            ));
+	    $cssPath = public_path("vendor/datasync/app.css");
+	    if (!file_exists($cssPath)) {
+            $this->warn('app.css not found in ' . $cssPath);
+            return;
         }
+
+        file_put_contents($cssPath, str_replace(
+            "/images/vendor/json-tree-viewer/libs/jsonTree/icons.svg",
+            "/vendor/datasync/img/icons.svg",
+            file_get_contents($cssPath)
+        ));
     }
 
 }
