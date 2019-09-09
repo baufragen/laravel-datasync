@@ -2,3 +2,9 @@
 @import 'fontawesome';
 
 @import "~json-tree-viewer/libs/jsonTree/jsonTree.css";
+
+#jsonData {
+  ul {
+    list-style: none;
+  }
+}
