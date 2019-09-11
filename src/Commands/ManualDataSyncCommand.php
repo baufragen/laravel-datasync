@@ -127,8 +127,13 @@ class ManualDataSyncCommand extends Command {
 	protected function triggerSync(DataSyncing $entity) {
         $this->verboseInfo('Syncing model ' . get_class($entity) . ' #' . $entity->id);
 
+        if (!method_exists($entity, "totalDataSync")) {
+            $this->error('Model ' . get_class($entity) . ' does not have totalDataSync method');
+            return;
+        }
+
         if (!$this->debug) {
-            dataSync($entity, new DataSyncAction(DataSyncAction::UPDATEORCREATE))->completeSync();
+            $entity->totalDataSync();
         }
     }
 
