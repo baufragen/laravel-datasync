@@ -25,4 +25,5 @@ interface DataSyncing {
     public function executeRelationSyncAttach(string $relation, $id, array $pivotData);
     public function executeRelationSyncDetach(string $relation, $id, array $pivotData);
     public function executeRelationSyncUpdate(string $relation, $id, array $pivotData);
+    public function executeRelationSyncReset(string $relation, array $relationData);
 }

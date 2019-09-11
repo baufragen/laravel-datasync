@@ -84,6 +84,6 @@ class RelationTransformer extends BaseTransformer {
     }
 
     public function getType() {
-        return 'action';
+        return 'relation';
     }
 }
