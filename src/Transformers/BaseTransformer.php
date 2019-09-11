@@ -39,10 +39,14 @@ abstract class BaseTransformer implements DataSyncTransforming {
             $action = new DataSyncAction($request->get('action'));
 
             if ($action->isUpdate() || $action->isDelete()) {
-                $model = $modelClass::findOrFail($request->get('identifier'));
+                if ($action->isUpdateOrCreate()) {
+                    $model = $modelClass::find($request->get('identifier'));
 
-                if (!$model && $action->isUpdateOrCreate()) {
-                    $model = new $modelClass();
+                    if (!$model) {
+                        $model = new $modelClass();
+                    }
+                } else {
+                    $model = $modelClass::findOrFail($request->get('identifier'));
                 }
             } else {
                 $model = new $modelClass();
