@@ -27,7 +27,7 @@ class RelationResetTransformer extends BaseTransformer {
             }
         }
 
-        $this->model->executeRelationSyncReset($this->relation, $this->relationData);
+        $this->model->executeRelationSyncReset($this->relation, $this->relationData->toArray());
 
         if (method_exists($this->model, "afterDataSyncExecution")) {
             if (!$this->model->afterDataSyncExecution($this)) {
