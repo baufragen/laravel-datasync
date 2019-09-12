@@ -33,31 +33,31 @@ class RelationResetCollector extends BaseCollector implements DataSyncCollecting
             return null;
         }
 
-        return [
-            array_merge(
-                [
-                    'name'      => 'relation',
-                    'contents'  => $this->relation,
-                ],
-                $this->relationData->map(function ($data, $index) use ($connection) {
-                    $pivotData = null;
-                    if (!empty($data['pivot'])) {
-                        $pivotData = json_encode($data['pivot']);
-                    }
-
-                    return [
-                        [
-                            'name'      => 'relationdata[' . $index . '][id]',
-                            'contents'  => $data['id'],
-                        ],
-                        [
-                            'name'      => 'relationdata[' . $index . '][pivot]',
-                            'contents'  => $connection->isEncrypted() ? encrypt($pivotData) : $pivotData,
-                        ]
-                    ];
-                })->toArray()
-            )
+        $result = [
+            [
+                'name'      => 'relation',
+                'contents'  => $this->relation,
+            ]
         ];
+
+        $this->relationData->each(function ($data, $index) use ($connection, &$result) {
+            $pivotData = null;
+            if (!empty($data['pivot'])) {
+                $pivotData = json_encode($data['pivot']);
+            }
+
+            $result[] = [
+                'name'      => 'relationdata[' . $index . '][id]',
+                'contents'  => $data['id'],
+            ];
+
+            $result[] = [
+                'name'      => 'relationdata[' . $index . '][pivot]',
+                'contents'  => $connection->isEncrypted() ? encrypt($pivotData) : $pivotData,
+            ];
+        });
+
+        return $result;
     }
 
     public function getType() {
