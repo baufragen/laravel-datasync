@@ -196,7 +196,7 @@ trait HasDataSync {
 
     public function executeRelationSyncReset(string $relation, array $relationData) {
         if (method_exists($this, $relation)) {
-            $this->{$relation}->sync($relationData);
+            $this->{$relation}()->sync($relationData);
         }
     }
 
