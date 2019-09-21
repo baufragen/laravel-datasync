@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync\Commands;
 
+use Baufragen\DataSync\DataSync;
 use Baufragen\DataSync\Helpers\DataSyncAction;
 use Baufragen\DataSync\Interfaces\DataSyncing;
 use Illuminate\Console\Command;
@@ -27,6 +28,15 @@ class ManualDataSyncCommand extends Command {
 
     protected $models = null;
     protected $ids = null;
+
+    protected $synced = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->synced = collect([]);
+    }
 
     /**
 	 * Execute the console command.
@@ -122,6 +132,12 @@ class ManualDataSyncCommand extends Command {
         if (!$this->debug) {
             app('dataSync.handler')->dispatch();
         }
+
+        $this->synced->each(function (DataSyncing $entity) {
+            if (method_exists($entity, "afterTotalDataSync")) {
+                $entity->afterTotalDataSync();
+            }
+        });
 	}
 
 	protected function triggerSync(DataSyncing $entity) {
@@ -135,6 +151,8 @@ class ManualDataSyncCommand extends Command {
         if (!$this->debug) {
             $entity->totalDataSync();
         }
+
+        $this->synced->push($entity);
     }
 
 	protected function verboseInfo($info) {
