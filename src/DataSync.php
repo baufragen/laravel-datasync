@@ -10,6 +10,8 @@ class DataSync {
      */
     public static $authUsing;
 
+    protected static $isEnabled = true;
+
     /**
      * Determine if the given request can access the DataSync dashboard.
      *
@@ -32,6 +34,18 @@ class DataSync {
     {
         static::$authUsing = $callback;
         return new static;
+    }
+
+    public static function disable() {
+        self::$isEnabled = false;
+    }
+
+    public static function enable() {
+        self::$isEnabled = true;
+    }
+
+    public static function isEnabled() {
+        return self::$isEnabled;
     }
 
 }

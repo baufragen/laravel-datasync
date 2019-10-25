@@ -5,6 +5,7 @@ namespace Baufragen\DataSync\Traits;
 use Baufragen\DataSync\Collectors\AllAttributeCollector;
 use Baufragen\DataSync\Collectors\AttributeCollector;
 use Baufragen\DataSync\Collectors\ChangedAttributeCollector;
+use Baufragen\DataSync\DataSync;
 use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\FileCollector;
 use Baufragen\DataSync\DataSyncLog;
@@ -21,19 +22,19 @@ trait HasDataSync {
     public static function bootHasDataSync() {
 
         static::created(function (DataSyncing $model) {
-            if ($model->automaticDataSyncEnabled()) {
+            if (DataSync::isEnabled() && $model->automaticDataSyncEnabled()) {
                 dataSync($model, AllAttributeCollector::class, new DataSyncAction(DataSyncAction::CREATE));
             }
         });
 
         static::updated(function (DataSyncing $model) {
-            if ($model->automaticDataSyncEnabled()) {
+            if (DataSync::isEnabled() && $model->automaticDataSyncEnabled()) {
                 dataSync($model, ChangedAttributeCollector::class, new DataSyncAction(DataSyncAction::UPDATE));
             }
         });
 
         static::deleted(function (DataSyncing $model) {
-            if ($model->automaticDataSyncEnabled()) {
+            if (DataSync::isEnabled() && $model->automaticDataSyncEnabled()) {
                 // TODO: implement deletion sync
             }
         });
