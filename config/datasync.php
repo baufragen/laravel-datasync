@@ -31,6 +31,7 @@ return [
         'action'            => Baufragen\DataSync\Collectors\ActionCollector::class,
         'relation'          => Baufragen\DataSync\Collectors\RelationCollector::class,
         'relationreset'     => Baufragen\DataSync\Collectors\RelationResetCollector::class,
+        'deletion'          => Baufragen\DataSync\Collectors\DeletionCollector::class,
         'dummy'             => Baufragen\DataSync\Collectors\DummyCollector::class,
     ],
 
@@ -41,6 +42,7 @@ return [
         'action'        => Baufragen\DataSync\Transformers\ActionTransformer::class,
         'relation'      => Baufragen\DataSync\Transformers\RelationTransformer::class,
         'relationreset' => Baufragen\DataSync\Transformers\RelationResetTransformer::class,
+        'deletion'      => Baufragen\DataSync\Transformers\DeletionTransformer::class,
     ]
 
 ];

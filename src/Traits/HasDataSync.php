@@ -5,6 +5,7 @@ namespace Baufragen\DataSync\Traits;
 use Baufragen\DataSync\Collectors\AllAttributeCollector;
 use Baufragen\DataSync\Collectors\AttributeCollector;
 use Baufragen\DataSync\Collectors\ChangedAttributeCollector;
+use Baufragen\DataSync\Collectors\DeletionCollector;
 use Baufragen\DataSync\DataSync;
 use Baufragen\DataSync\Interfaces\DataSyncCollecting;
 use Baufragen\DataSync\Collectors\FileCollector;
@@ -35,7 +36,7 @@ trait HasDataSync {
 
         static::deleted(function (DataSyncing $model) {
             if (DataSync::isEnabled() && $model->automaticDataSyncEnabled()) {
-                // TODO: implement deletion sync
+                dataSync($model, DeletionCollector::class, new DataSyncAction(DataSyncAction::DELETE));
             }
         });
 
@@ -199,6 +200,10 @@ trait HasDataSync {
         if (method_exists($this, $relation)) {
             $this->{$relation}()->sync($relationData);
         }
+    }
+
+    public function executeDataSyncDeletion() {
+        $this->delete();
     }
 
 }
