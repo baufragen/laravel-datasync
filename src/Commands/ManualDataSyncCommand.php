@@ -15,7 +15,7 @@ class ManualDataSyncCommand extends Command {
 	 *
 	 * @var string
 	 */
-	protected $signature = 'datasync:manual-sync {--debug} {--model=} {--id=}';
+	protected $signature = 'datasync:manual-sync {--debug} {--model=} {--id=} {--skip=} {--take=}';
 
 	/**
 	 * The console command description.
@@ -30,6 +30,9 @@ class ManualDataSyncCommand extends Command {
     protected $ids = null;
 
     protected $synced = null;
+
+    protected $skip = null;
+    protected $take = null;
 
     public function __construct()
     {
@@ -46,6 +49,8 @@ class ManualDataSyncCommand extends Command {
 	public function handle()
 	{
         $this->debug = $this->option('debug');
+        $this->skip = $this->option('skip', null);
+        $this->take = $this->option('take', null);
 
         $model = $this->option('model', null);
         if ($model) {
@@ -112,7 +117,13 @@ class ManualDataSyncCommand extends Command {
                     });
                 } else {
                     // for every model, get all instances (possibly chunked to save memory)
-                    $modelClass::chunk(100, function ($entities) use ($modelClass) {
+                    $modelClass::when($this->skip, function ($query) {
+                        $query->skip($this->skip);
+                    })
+                        ->when($this->take, function ($query) {
+                            $query->take($this->take);
+                        })
+                        ->chunk(100, function ($entities) use ($modelClass) {
 
                         $entities->each(function ($entity) use ($modelClass) {
 
