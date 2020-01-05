@@ -118,15 +118,13 @@ class ManualDataSyncCommand extends Command {
                 } else {
                     // for every model, get all instances (possibly chunked to save memory)
                     $modelClass::when($this->skip, function ($query) {
-                        $query->skip($this->skip);
-                    })
+                            $query->skip($this->skip);
+                        })
                         ->when($this->take, function ($query) {
                             $query->take($this->take);
                         })
-                        ->chunk(100, function ($entities) use ($modelClass) {
-
-                        $entities->each(function ($entity) use ($modelClass) {
-
+                        ->get()
+                        ->each(function ($entity) use ($modelClass) {
                             try {
 
                                 $this->triggerSync($entity);
@@ -134,9 +132,7 @@ class ManualDataSyncCommand extends Command {
                             } catch (\Exception $e) {
                                 $this->error('Error during sync for ' . $modelClass . ' [' . $entity->id . ']: ' . $e->getMessage());
                             }
-
                         });
-                    });
                 }
         });
 
