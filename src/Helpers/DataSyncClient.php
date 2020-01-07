@@ -13,6 +13,10 @@ class DataSyncClient extends Client {
             'verify'    => false, // TODO: make this configurable
         ];
 
+        if ($connection->hasAuth()) {
+            $config['auth'] = $connection->getAuth();
+        }
+
         parent::__construct($config);
     }
 }

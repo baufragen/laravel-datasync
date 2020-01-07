@@ -32,4 +32,15 @@ class DataSyncConnection {
     public function getApiKey() {
         return $this->config['apikey'];
     }
+
+    public function hasAuth() {
+        return !empty($this->config['auth_user']) && !empty($this->config['auth_password']);
+    }
+
+    public function getAuth() {
+        return [
+            $this->config['auth_user'],
+            $this->config['auth_password'],
+        ];
+    }
 }

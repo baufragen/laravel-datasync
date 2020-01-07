@@ -19,6 +19,8 @@ return [
             'apikey'    => '123456789',
             'enabled'   => true,
             'encrypted' => true,
+            'auth_user' => null,
+            'auth_password' => null,
         ],
 
     ],
