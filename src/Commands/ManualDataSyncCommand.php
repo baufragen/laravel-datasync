@@ -136,15 +136,15 @@ class ManualDataSyncCommand extends Command {
                 }
         });
 
-        if (!$this->debug) {
-            app('dataSync.handler')->dispatch();
-        }
-
         $this->synced->each(function (DataSyncing $entity) {
             if (method_exists($entity, "afterTotalDataSync")) {
                 $entity->afterTotalDataSync();
             }
         });
+
+        if (!$this->debug) {
+            app('dataSync.handler')->dispatch();
+        }
 	}
 
 	protected function triggerSync(DataSyncing $entity) {
