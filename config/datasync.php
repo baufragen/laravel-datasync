@@ -45,6 +45,10 @@ return [
         'relation'      => Baufragen\DataSync\Transformers\RelationTransformer::class,
         'relationreset' => Baufragen\DataSync\Transformers\RelationResetTransformer::class,
         'deletion'      => Baufragen\DataSync\Transformers\DeletionTransformer::class,
-    ]
+    ],
+
+    'settings'  => [
+        'log_payload_on_success'    => env('DATASYNC_LOG_SUCCESSFUL_PAYLOAD', false),
+    ],
 
 ];

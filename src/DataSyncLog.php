@@ -70,7 +70,7 @@ class DataSyncLog extends Model
             'model'         => $model,
             'identifier'    => $identifier,
             'connection'    => $connection->getName(),
-            'payload'       => app()->environment('production') ? null : json_encode($payload),
+            'payload'       => self::payloadShouldBeLogged() ? json_encode($payload) : null,
             'response'      => app()->environment('production') ? $response->getStatusCode() : $response->getBody(),
         ]);
     }
@@ -85,5 +85,13 @@ class DataSyncLog extends Model
             'payload'       => app()->environment('production') ? encrypt(json_encode($payload)) : json_encode($payload),
             'response'      => $response->getBody(),
         ]);
+    }
+
+    public static function payloadShouldBeLogged() {
+        if (!app()->environment('production')) {
+            return true;
+        }
+
+        return config('datasync.settings.log_payload_on_success', false);
     }
 }
