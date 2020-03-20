@@ -3,13 +3,11 @@
 namespace Baufragen\DataSync\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Console\DetectsApplicationNamespace;
+use Illuminate\Container\Container;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallCommand extends Command {
-    use DetectsApplicationNamespace;
-
 	/**
 	 * The console command signature.
 	 *
@@ -46,7 +44,7 @@ class InstallCommand extends Command {
 	}
 
 	protected function registerDataSyncServiceProvider() {
-        $namespace = Str::replaceLast('\\', '', $this->getAppNamespace());
+        $namespace = Str::replaceLast('\\', '', Container::getInstance()->getNamespace());
         $appConfig = file_get_contents(config_path('app.php'));
         if (Str::contains($appConfig, $namespace.'\\Providers\\DataSyncServiceProvider::class')) {
             return;
