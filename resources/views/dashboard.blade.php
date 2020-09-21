@@ -5,7 +5,7 @@
 
     <div class="row">
         <div class="col-md-8">
-            {{ $logs->appends($filter)->links() }}
+            {{ $logs->appends(['filter' => $filter])->links() }}
         </div>
         <div class="col-md-4">
             <form method="get">
