@@ -2,6 +2,7 @@
 
 namespace Baufragen\DataSync;
 
+use Baufragen\DataSync\Commands\CleanUpDataSyncLogsCommand;
 use Baufragen\DataSync\Commands\InstallCommand;
 use Baufragen\DataSync\Commands\ManualDataSyncCommand;
 use Baufragen\DataSync\Helpers\DataSyncContainer;
@@ -22,6 +23,7 @@ class DataSyncServiceProvider extends ServiceProvider {
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                CleanUpDataSyncLogsCommand::class,
                 ManualDataSyncCommand::class,
                 InstallCommand::class,
             ]);
