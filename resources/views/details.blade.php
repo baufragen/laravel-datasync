@@ -15,7 +15,7 @@
             <span>in <strong>{{ $log->getResponseValue('file') }}</strong> Zeile <strong>{{ $log->getResponseValue('line') }}</strong></span>
         </div>
 
-        <div id="jsonData" data-json-data="{{ $log->getResponseValue('trace') }}">
+        <div id="jsonData" data-json-data='@json($log->getResponseValue('trace'))'>
         </div>
     @endif
 @endsection
