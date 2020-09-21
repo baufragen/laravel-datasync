@@ -7,10 +7,14 @@
         <div class="col-md-8">
             {{ $logs->appends(['filter' => $filter])->links() }}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 text-right">
             <form method="get">
-                <input type="checkbox" name="filter[success][]" value="successful" @if(in_array('successful', $filter['success'])) checked="checked" @endif /> Successful
-                <input type="checkbox" name="filter[success][]" value="failed" @if(in_array('failed', $filter['success'])) checked="checked" @endif /> Failed
+                <label>
+                    <input type="checkbox" name="filter[success][]" value="successful" @if(in_array('successful', $filter['success'])) checked="checked" @endif /> Successful
+                </label>
+                <label>
+                    <input type="checkbox" name="filter[success][]" value="failed" @if(in_array('failed', $filter['success'])) checked="checked" @endif /> Failed
+                </label>
                 <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
             </form>
         </div>
