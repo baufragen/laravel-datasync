@@ -63,6 +63,18 @@ class DataSyncLog extends Model
         return $this->identifier;
     }
 
+    public function getResponseValue($key) {
+        if (empty($this->response)) {
+            return null;
+        }
+
+        if (!isset($this->response[$key])) {
+            return null;
+        }
+
+        return $this->response[$key];
+    }
+
     public static function succeeded($type, $model, $identifier, DataSyncConnection $connection, $payload, $response) {
         return self::create([
             'successful'    => true,
