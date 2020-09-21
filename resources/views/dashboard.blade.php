@@ -3,7 +3,18 @@
 @section('content')
     <h1>Dashboard</h1>
 
-    {{ $logs->links() }}
+    <div class="row">
+        <div class="col-md-8">
+            {{ $logs->appends($filter)->links() }}
+        </div>
+        <div class="col-md-4">
+            <form method="get">
+                <input type="checkbox" name="filter[success][]" value="successful" @if(in_array('successful', $filter['success'])) checked="checked" @endif /> Successful
+                <input type="checkbox" name="filter[success][]" value="failed" @if(in_array('failed', $filter['success'])) checked="checked" @endif /> Failed
+                <button class="btn btn-sm btn-outline-primary" type="submit">Filter</button>
+            </form>
+        </div>
+    </div>
 
     <table class="table table-striped">
         <thead>

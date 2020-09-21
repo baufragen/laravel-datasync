@@ -14,21 +14,29 @@ class DashboardController extends Controller {
     }
 
     public function view(Request $request) {
-        $logs = DataSyncLog::orderBy('created_at', 'DESC')
-            ->when($request->filled('filter'), function ($query) use ($request) {
-                switch ($request->get('filter')) {
-                    case 'successful':
-                        $query->successful();
-                        break;
+        $filter = $request->input('filter', [
+            'success' => ['successful', 'failed'],
+        ]);
 
-                    case 'failed':
-                        $query->failed();
-                        break;
-                }
+        $logs = DataSyncLog::orderBy('created_at', 'DESC')
+            ->when(!empty($filter['success']), function ($query) use ($filter) {
+                $query->where(function($query) use ($filter) {
+                    if (!empty($filter['success']) && in_array('successful', $filter['success'])) {
+                        $query->where(function ($query) use ($filter) {
+                            $query->successful();
+                        });
+                    }
+
+                    if (!empty($filter['success']) && in_array('failed', $filter['success'])) {
+                        $query->orWhere(function ($query) use ($filter) {
+                            $query->failed();
+                        });
+                    }
+                });
             })
             ->paginate(50);
 
-        return view('dataSync::dashboard', compact("logs"));
+        return view('dataSync::dashboard', compact("logs", "filter"));
     }
 
     public function details(DataSyncLog $log) {
