@@ -68,11 +68,13 @@ class DataSyncLog extends Model
             return null;
         }
 
-        if (!isset($this->response[$key])) {
+        $response = json_decode($this->response, true);
+
+        if (!isset($response[$key])) {
             return null;
         }
 
-        return $this->response[$key];
+        return $response[$key];
     }
 
     public static function succeeded($type, $model, $identifier, DataSyncConnection $connection, $payload, $response) {
