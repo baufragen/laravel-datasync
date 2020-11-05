@@ -53,7 +53,7 @@
                         {{ $log->connection }}
                     </td>
                     <td class="text-right">
-                        <a class="btn btn-outline-info" href="{{ route('dataSync.dashboard.details', ['dataSyncLog' => $log]) }}">Details</a>
+                        <a class="btn btn-outline-info" href="{{ route('dataSync.dashboard.details', ['log' => $log]) }}">Details</a>
                     </td>
                 </tr>
                 @empty
