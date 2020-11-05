@@ -7,7 +7,7 @@ if (!function_exists('dataSync')) {
      * @return Baufragen\DataSync\Interfaces\DataSyncCollecting
      */
     function dataSync(\Baufragen\DataSync\Interfaces\DataSyncing $model, string $collectorClass, ...$afterCreationParameters) {
-        if (!\Baufragen\DataSync\DataSync::isEnabled()) {
+        if (!\Baufragen\DataSync\DataSync::isEnabled() || !$model->dataSyncEnabled()) {
             return optional(null);
         }
 
