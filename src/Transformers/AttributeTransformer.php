@@ -43,7 +43,7 @@ class AttributeTransformer extends BaseTransformer {
     }
 
     public function hasAttribute($key) {
-        return array_key_exists($key, $this->attributes);
+        return $this->attributes->has($key);
     }
 
     public function pullAttribute($key) {
