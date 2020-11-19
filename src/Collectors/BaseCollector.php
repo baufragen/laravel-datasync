@@ -12,11 +12,14 @@ abstract class BaseCollector {
     protected $identifier       = null;
     protected $loggingEnabled   = true;
 
+    protected $hooks;
+
     /** @var DataSyncing */
     protected $model;
 
     public function __construct() {
-        $this->connections = collect();
+        $this->connections  = collect();
+        $this->hooks        = collect();
     }
 
     public function setModel(DataSyncing $model) {
@@ -75,5 +78,21 @@ abstract class BaseCollector {
 
     public function shouldLog() {
         return true;
+    }
+
+    public function addHook(string $name, callable $callback) {
+        if (empty($this->hooks[$name])) {
+            $this->hooks[$name] = collect();
+        }
+
+        $this->hooks[$name]->push($callback);
+    }
+
+    public function hasHooks(string $name) {
+        return !empty($this->hooks[$name]) && $this->hooks[$name]->isNotEmpty();
+    }
+
+    public function getHooks(string $name) {
+        return $this->hooks[$name];
     }
 }

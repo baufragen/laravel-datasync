@@ -7,6 +7,7 @@ use Baufragen\DataSync\DataSyncLog;
 use Baufragen\DataSync\Exceptions\DataSyncRequestFailedException;
 use Baufragen\DataSync\Helpers\DataSyncClient;
 use Baufragen\DataSync\Helpers\DataSyncConnection;
+use Baufragen\DataSync\Interfaces\DataSyncing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -29,6 +30,12 @@ class HandleDataSync implements ShouldQueue {
             ->getConnections()
             ->each(function(DataSyncConnection $connection) {
                 $this->syncToConnection($connection);
+
+                if ($this->dataCollector->hasHooks(DataSyncCollecting::HOOK_AFTER_SYNC)) {
+                    $this->dataCollector->getHooks(DataSyncCollecting::HOOK_AFTER_SYNC)->each(function(callable $callback) {
+                        call_user_func_array($callback, [$this->dataCollector]);
+                    });
+                }
             });
     }
 
