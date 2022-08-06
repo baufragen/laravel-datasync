@@ -52,8 +52,6 @@ class DataSyncHandler {
                 }
                 HandleDataSync::dispatch($collector);
             });
-
-        $this->dataCollectors = collect();
     }
 
     protected function createDataCollectorForModel(DataSyncing $model, string $collectorClass) {
