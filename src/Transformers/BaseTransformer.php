@@ -14,6 +14,7 @@ abstract class BaseTransformer implements DataSyncTransforming {
     protected $request;
     protected $connection;
     protected $model;
+    protected $hooks;
 
     public function __construct(Request $request, DataSyncConnection $connection) {
         $this->request = $request;
@@ -60,5 +61,27 @@ abstract class BaseTransformer implements DataSyncTransforming {
         }
 
         return $model;
+    }
+
+    public function addHook(string $type, callable $callback) {
+        if (empty($this->hooks[$type])) {
+            $this->hooks[$type] = [];
+        }
+
+        $this->hooks[$type][] = $callback;
+    }
+
+    protected function executeHooks(string $type) {
+        if (empty($this->hooks[$type])) {
+            return;
+        }
+
+        foreach ($this->hooks[$type] as $hook) {
+            $hook($this);
+        }
+    }
+
+    public function getModel() {
+        return $this->model;
     }
 }
