@@ -4,9 +4,10 @@ namespace Baufragen\DataSync\Transformers;
 
 use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Baufragen\DataSync\Interfaces\DataSyncing;
+use Baufragen\DataSync\Interfaces\ReportsSyncedRelation;
 use Illuminate\Http\Request;
 
-class RelationTransformer extends BaseTransformer {
+class RelationTransformer extends BaseTransformer implements ReportsSyncedRelation {
     protected $relation;
     protected $type;
     protected $id;
@@ -85,5 +86,21 @@ class RelationTransformer extends BaseTransformer {
 
     public function getType() {
         return 'relation';
+    }
+
+    public function getRelation() {
+        return $this->relation;
+    }
+
+    public function getOperation() {
+        return $this->type;
+    }
+
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getPivotData() {
+        return $this->pivotData;
     }
 }

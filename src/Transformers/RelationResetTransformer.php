@@ -4,9 +4,10 @@ namespace Baufragen\DataSync\Transformers;
 
 use Baufragen\DataSync\Helpers\DataSyncConnection;
 use Baufragen\DataSync\Interfaces\DataSyncing;
+use Baufragen\DataSync\Interfaces\ReportsSyncedRelation;
 use Illuminate\Http\Request;
 
-class RelationResetTransformer extends BaseTransformer {
+class RelationResetTransformer extends BaseTransformer implements ReportsSyncedRelation {
     protected $relation;
     protected $relationData;
 
@@ -65,5 +66,13 @@ class RelationResetTransformer extends BaseTransformer {
 
     public function getType() {
         return 'relationreset';
+    }
+
+    public function getRelation() {
+        return $this->relation;
+    }
+
+    public function getRelationData() {
+        return $this->relationData->toArray();
     }
 }
